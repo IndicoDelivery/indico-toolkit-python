@@ -1,6 +1,6 @@
 import pytest
 
-from indico_toolkit import ToolkitInputError
+from indico_toolkit.errors import ToolkitInputError
 from indico_toolkit.types import Extractions, WorkflowResult
 from indico_toolkit.types.classification import Classification
 

@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import pytest
 
-from indico_toolkit import ToolkitInputError
+from indico_toolkit.errors import ToolkitInputError
 from indico_toolkit.snapshots import Snapshot
 
 pd = pytest.importorskip("pandas")
