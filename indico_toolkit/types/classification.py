@@ -1,14 +1,7 @@
+import csv
 from operator import itemgetter
 from pathlib import Path
 from typing import Dict
-
-try:
-    import pandas as pd
-
-    _PANDAS_INSTALLED = True
-except ImportError as error:
-    _PANDAS_INSTALLED = False
-    _IMPORT_ERROR = error
 
 
 class Classification:
@@ -44,19 +37,19 @@ class Classification:
     def to_csv(
         self, save_path, filename: str = "", append_if_exists: bool = True
     ) -> None:
-        if not _PANDAS_INSTALLED:
-            raise RuntimeError(
-                "saving predictions to CSV requires additional dependencies: "
-                "`pip install indico-toolkit[predictions]`"
-            ) from _IMPORT_ERROR
+        row = dict(self._pred)
+        row["filename"] = filename
+        fieldnames = list(row.keys())
+        append = append_if_exists and Path(save_path).exists()
+        mode = "a" if append else "w"
 
-        results = {filename: self._pred}
-        df = pd.DataFrame(results).transpose()
-        df["filename"] = filename
-        if append_if_exists and Path(save_path).exists():
-            df.to_csv(save_path, mode="a", header=False, index=False)
-        else:
-            df.to_csv(save_path, index=False)
+        with open(save_path, mode, newline="") as csv_file:
+            csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+            if not append:
+                csv_writer.writeheader()
+
+            csv_writer.writerow(row)
 
 
 class ClassificationMGP(Classification):

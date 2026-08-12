@@ -1,17 +1,10 @@
+import csv
 from collections import Counter, defaultdict
 from copy import deepcopy
 from pathlib import Path
 from typing import Dict, Iterable, List, Set, Union
 
 from ..errors import ToolkitInputError
-
-try:
-    import pandas as pd
-
-    _PANDAS_INSTALLED = True
-except ImportError as error:
-    _PANDAS_INSTALLED = False
-    _IMPORT_ERROR = error
 
 
 class Extractions:
@@ -210,18 +203,29 @@ class Extractions:
             filename (str, optional): the file where the preds were derived from.
                 Defaults to "".
         """
-        if not _PANDAS_INSTALLED:
-            raise RuntimeError(
-                "saving predictions to CSV requires additional dependencies: "
-                "`pip install indico-toolkit[predictions]`"
-            ) from _IMPORT_ERROR
-
         preds = self.set_confidence_key_to_max_value(inplace=False)
-        df = pd.DataFrame(preds)
-        if not include_start_end:
-            df.drop(["start", "end"], axis=1, inplace=True)
-        df["filename"] = filename
-        if append_if_exists and Path(save_path).exists():
-            df.to_csv(save_path, mode="a", header=False, index=False)
-        else:
-            df.to_csv(save_path, index=False)
+
+        for pred in preds:
+            if not include_start_end:
+                pred.pop("start", None)
+                pred.pop("end", None)
+
+            pred["filename"] = filename
+
+        fieldnames: List[str] = []
+
+        for pred in preds:
+            for key in pred:
+                if key not in fieldnames:
+                    fieldnames.append(key)
+
+        append = append_if_exists and Path(save_path).exists()
+        mode = "a" if append else "w"
+
+        with open(save_path, mode, newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+
+            if not append:
+                writer.writeheader()
+
+            writer.writerows(preds)
