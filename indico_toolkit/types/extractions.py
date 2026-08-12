@@ -1,9 +1,9 @@
 from collections import Counter, defaultdict
 from copy import deepcopy
+from pathlib import Path
 from typing import Dict, Iterable, List, Set, Union
 
 from ..errors import ToolkitInputError
-from ..pipelines import FileProcessing
 
 try:
     import pandas as pd
@@ -221,7 +221,7 @@ class Extractions:
         if not include_start_end:
             df.drop(["start", "end"], axis=1, inplace=True)
         df["filename"] = filename
-        if append_if_exists and FileProcessing.file_exists(save_path):
+        if append_if_exists and Path(save_path).exists():
             df.to_csv(save_path, mode="a", header=False, index=False)
         else:
             df.to_csv(save_path, index=False)

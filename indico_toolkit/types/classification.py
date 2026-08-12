@@ -1,7 +1,6 @@
 from operator import itemgetter
+from pathlib import Path
 from typing import Dict
-
-from ..pipelines import FileProcessing
 
 try:
     import pandas as pd
@@ -54,7 +53,7 @@ class Classification:
         results = {filename: self._pred}
         df = pd.DataFrame(results).transpose()
         df["filename"] = filename
-        if append_if_exists and FileProcessing.file_exists(save_path):
+        if append_if_exists and Path(save_path).exists():
             df.to_csv(save_path, mode="a", header=False, index=False)
         else:
             df.to_csv(save_path, index=False)
