@@ -6,7 +6,7 @@ import pytest
 from indico_toolkit import etloutput
 from indico_toolkit.etloutput import NULL_SPAN, NULL_TOKEN, CellType, EtlOutput, Span
 
-data_folder = Path(__file__).parent.parent / "data" / "etloutput"
+data_folder = Path(__file__).parent / "data"
 etl_output_file = data_folder / "4725" / "111924" / "110239" / "etl_output.json"
 
 

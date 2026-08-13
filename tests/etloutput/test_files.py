@@ -4,7 +4,7 @@ import pytest
 
 from indico_toolkit import etloutput
 
-data_folder = Path(__file__).parent.parent / "data" / "etloutput"
+data_folder = Path(__file__).parent / "data"
 
 
 def read_uri(uri: str | Path) -> str:
