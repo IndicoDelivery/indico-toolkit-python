@@ -1,6 +1,5 @@
 from typing import List
 
-from ..errors import ToolkitInputError
 from .predictions import Predictions
 
 
@@ -19,7 +18,7 @@ class WorkflowResult:
 
     def _check_is_valid_model_name(self) -> None:
         if self.model_name not in self.available_model_names:
-            raise ToolkitInputError(
+            raise KeyError(
                 f"{self.model_name} is not an available model name. "
                 f"Options: {self.available_model_names}"
             )
@@ -85,7 +84,7 @@ class WorkflowResult:
         if self.model_name:
             self._check_is_valid_model_name()
         elif len(self.available_model_names) > 1:
-            raise ToolkitInputError(
+            raise RuntimeError(
                 "Multiple models available, you must set self.model_name to one of "
                 f"{self.available_model_names}"
             )

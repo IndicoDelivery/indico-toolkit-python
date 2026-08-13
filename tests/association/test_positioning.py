@@ -4,7 +4,6 @@ import os
 import pytest
 
 from indico_toolkit.association import Positioning
-from indico_toolkit.errors import ToolkitInputError
 
 
 def generate_mapped_pred(
@@ -134,7 +133,7 @@ def test_positioned_above_overlap_same_page_true(input, expected):
 
 def test_positioned_above_overlap_same_page_false():
     position = Positioning()
-    with pytest.raises(ToolkitInputError):
+    with pytest.raises(ValueError):
         position.positioned_above_overlap(
             generate_mapped_pred(page_num=1),
             generate_mapped_pred(),
@@ -216,7 +215,7 @@ def test_get_min_distance(input, expected):
 
 def test_get_min_distance_page_exception():
     position = Positioning()
-    with pytest.raises(ToolkitInputError):
+    with pytest.raises(ValueError):
         position.get_min_distance(
             generate_mapped_pred(), generate_mapped_pred(page_num=1)
         )
@@ -237,7 +236,7 @@ def test_get_min_distance_different_pages(input, expected):
 
 def test_get_horizontal_overlap_different_pages():
     position = Positioning()
-    with pytest.raises(ToolkitInputError):
+    with pytest.raises(ValueError):
         position.get_horizontal_overlap(
             generate_mapped_pred(page_num=1),
             generate_mapped_pred(),
@@ -267,7 +266,7 @@ def test_get_horizontal_overlap(input, expected):
 
 def test_get_vertical_overlap_different_pages():
     position = Positioning()
-    with pytest.raises(ToolkitInputError):
+    with pytest.raises(ValueError):
         position.get_vertical_overlap(
             generate_mapped_pred(page_num=1),
             generate_mapped_pred(),
@@ -383,5 +382,5 @@ def test_get_tokens_null_bounds(bbox_token_page):
 
 def test_get_tokens_within_bounds_throws_error():
     positioning = Positioning()
-    with pytest.raises(ToolkitInputError):
+    with pytest.raises(RuntimeError):
         positioning.get_tokens_within_bounds(generate_mapped_pred(), [{}])

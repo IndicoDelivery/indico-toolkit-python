@@ -4,8 +4,6 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Dict, Iterable, List, Set, Union
 
-from ..errors import ToolkitInputError
-
 
 class Extractions:
     """
@@ -169,7 +167,7 @@ class Extractions:
         Return the most common text value. If there is a tie- returns None.
         """
         if label not in self.label_set:
-            raise ToolkitInputError(f"There are no predictions for: '{label}'")
+            raise KeyError(f"There are no predictions for: '{label}'")
         text_vals = self.get_text_values(label)
         if len(set(text_vals)) == 1:
             return text_vals[0]

@@ -1,4 +1,3 @@
-from ..errors import ToolkitInputError
 from .classification import Classification, ClassificationMGP
 from .extractions import Extractions
 
@@ -22,7 +21,7 @@ class Predictions:
             else:
                 return ClassificationMGP(predictions)
         else:
-            raise ToolkitInputError(
+            raise TypeError(
                 f"Unable to process predictions with type {type(predictions)}. "
                 f"Predictions: {predictions}"
             )
