@@ -32,7 +32,11 @@ def test_to_csv(classification_obj):
         filepath = tf.name
         classification_obj.to_csv(filepath, filepath, append_if_exists=False)
         df = pd.read_csv(filepath)
-        assert "confidence" and "label" and "filename" in df.columns
+        assert (
+            "confidence" in df.columns
+            and "label" in df.columns
+            and "filename" in df.columns
+        )
         assert df.shape == (1, 3)
         duplicated_obj.to_csv(filepath, append_if_exists=True)
         df = pd.read_csv(filepath)
