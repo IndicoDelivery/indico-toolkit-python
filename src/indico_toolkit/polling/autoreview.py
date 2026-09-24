@@ -184,8 +184,7 @@ class AutoReviewPoller:
             logger.info(f"Completed auto review of {submission_id=}")
         else:
             logger.error(
-                f"Submit failed for {submission_id=}: "
-                f"{job.status=!r} {job.result=!r}"
+                f"Submit failed for {submission_id=}: {job.status=!r} {job.result=!r}"
             )
 
     async def _reap_workers(self) -> None:

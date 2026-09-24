@@ -317,14 +317,18 @@ class PredictionList(List[PredictionType]):
 
         if accepted is not None:
             predicates.append(
-                lambda prediction: isinstance(prediction, Extraction)
-                and prediction.accepted == accepted
+                lambda prediction: (
+                    isinstance(prediction, Extraction)
+                    and prediction.accepted == accepted
+                )
             )
 
         if rejected is not None:
             predicates.append(
-                lambda prediction: isinstance(prediction, Extraction)
-                and prediction.rejected == rejected
+                lambda prediction: (
+                    isinstance(prediction, Extraction)
+                    and prediction.rejected == rejected
+                )
             )
 
         if checked is not None:
