@@ -62,7 +62,7 @@ class WorkflowResult:
             reviews = preds["post_reviews"]
             for review in reviews:
                 post_review_preds.append(Predictions.get_obj(review))
-            return post_review_preds
+            return post_review_preds  # type: ignore[ty:invalid-return-type]
         else:
             return Predictions.get_obj([])
 

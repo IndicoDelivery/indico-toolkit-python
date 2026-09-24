@@ -52,7 +52,7 @@ class LineItems(Association):
         )
 
     @staticmethod
-    def match_pred_to_token(pred: dict, ocr_tokens: List[dict]):
+    def match_pred_to_token(pred: dict, ocr_tokens: List[dict]):  # type: ignore[ty:invalid-method-override]
         """
         Match and add bounding box metadata to prediction.
 

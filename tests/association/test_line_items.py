@@ -82,7 +82,7 @@ def test_prediction_reordering(three_row_invoice_preds, three_row_invoice_tokens
 
 def test_empty_line_items_init(three_row_invoice_preds, three_row_invoice_tokens):
     with pytest.raises(TypeError):
-        LineItems(three_row_invoice_preds)
+        LineItems(three_row_invoice_preds)  # type: ignore[ty:missing-argument]
 
 
 def test_mapped_positions_by_page(three_row_invoice_preds, three_row_invoice_tokens):

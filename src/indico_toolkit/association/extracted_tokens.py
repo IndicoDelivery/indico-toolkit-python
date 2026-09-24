@@ -15,7 +15,7 @@ class ExtractedTokens(Association):
     def __init__(self, predictions: Union[List[dict], Extractions]):
         super().__init__(predictions)
 
-    def match_pred_to_token(self, pred: dict, ocr_tokens: List[dict], pred_index: int):
+    def match_pred_to_token(self, pred: dict, ocr_tokens: List[dict], pred_index: int):  # type: ignore[ty:invalid-method-override]
         """
         Append matching token positions to self.mapped_positions, if no matches for
         pred, raise ValueError

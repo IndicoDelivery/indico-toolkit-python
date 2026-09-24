@@ -32,7 +32,11 @@ KeyType = TypeVar("KeyType")
 
 # Non-None sentinel value to support `PredictionList.where(review=None)`.
 REVIEW_UNSPECIFIED: Final = Review(
-    id=None, reviewer_id=None, notes=None, rejected=None, type=None  # type: ignore[arg-type]
+    id=None,  # type: ignore[ty:invalid-argument-type]
+    reviewer_id=None,  # type: ignore[ty:invalid-argument-type]
+    notes=None,  # type: ignore[ty:invalid-argument-type]
+    rejected=None,  # type: ignore[ty:invalid-argument-type]
+    type=None,  # type: ignore[ty:invalid-argument-type]
 )
 
 
@@ -168,7 +172,7 @@ class PredictionList(List[PredictionType]):
         """
         Return a new prediction list containing predictions of type `type`.
         """
-        return self.where(lambda prediction: isinstance(prediction, type))  # type: ignore[return-value]
+        return self.where(lambda prediction: isinstance(prediction, type))  # type: ignore[ty:invalid-return-type]
 
     def orderby(
         self,

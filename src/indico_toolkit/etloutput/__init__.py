@@ -69,13 +69,14 @@ def load(
         ):
             etl_output = json_loaded(etl_output)
         else:
-            etl_output = json_loaded(reader(etl_output))  # type: ignore[arg-type]
+            etl_output = json_loaded(reader(etl_output))  # type: ignore[ty:invalid-argument-type]
 
     pages = get(etl_output, list, "pages")
 
     if text and has(pages, str, 0, "text"):
         text_pages = map(
-            lambda page: str_decoded(reader(get(page, str, "text"))), pages  # type: ignore[arg-type]
+            lambda page: str_decoded(reader(get(page, str, "text"))),  # type: ignore[ty:invalid-argument-type]
+            pages,
         )
     else:
         text_pages = ()  # type: ignore[assignment]
@@ -130,13 +131,14 @@ async def load_async(
         ):
             etl_output = json_loaded(etl_output)
         else:
-            etl_output = json_loaded(await reader(etl_output))  # type: ignore[arg-type]
+            etl_output = json_loaded(await reader(etl_output))  # type: ignore[ty:invalid-argument-type]
 
     pages = get(etl_output, list, "pages")
 
     if text and has(pages, str, 0, "text"):
         text_pages = [
-            str_decoded(await reader(get(page, str, "text"))) for page in pages  # type: ignore[arg-type]
+            str_decoded(await reader(get(page, str, "text")))  # type: ignore[ty:invalid-argument-type]
+            for page in pages
         ]
     else:
         text_pages = ()  # type: ignore[assignment]

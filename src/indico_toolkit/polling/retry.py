@@ -62,7 +62,7 @@ def retry(
             @wraps(decorated)
             async def retrying_coroutine(  # type: ignore[return]
                 *args: "ArgumentsType.args", **kwargs: "ArgumentsType.kwargs"
-            ) -> "ReturnType":
+            ) -> "ReturnType":  # type: ignore[ty:invalid-return-type]
                 for times_retried in range(count + 1):
                     try:
                         return await decorated(*args, **kwargs)  # type: ignore[no-any-return]
@@ -78,7 +78,7 @@ def retry(
             @wraps(decorated)
             def retrying_function(  # type: ignore[return]
                 *args: "ArgumentsType.args", **kwargs: "ArgumentsType.kwargs"
-            ) -> "ReturnType":
+            ) -> "ReturnType":  # type: ignore[ty:invalid-return-type]
                 for times_retried in range(count + 1):
                     try:
                         return decorated(*args, **kwargs)
