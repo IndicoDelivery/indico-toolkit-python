@@ -76,6 +76,8 @@ class DownstreamPoller:
                 *(self._reap_workers() for _ in range(self._worker_count)),
             )
 
+        assert False, "NoReturn"
+
     async def _spawn_workers(self) -> None:
         """
         Poll for completed and failed submissions and spawn workers to send them

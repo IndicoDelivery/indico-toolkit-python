@@ -7,7 +7,7 @@ def test_rejected() -> None:
         documents=None,  # type: ignore[ty:invalid-argument-type]
         tasks=None,  # type: ignore[ty:invalid-argument-type]
         predictions=None,  # type: ignore[ty:invalid-argument-type]
-        reviews=[
+        reviews=(
             Review(
                 id=None,  # type: ignore[ty:invalid-argument-type]
                 reviewer_id=None,  # type: ignore[ty:invalid-argument-type]
@@ -15,7 +15,7 @@ def test_rejected() -> None:
                 rejected=True,
                 type=None,  # type: ignore[ty:invalid-argument-type]
             ),
-        ],
+        ),
     )
 
     assert result.rejected
@@ -27,7 +27,7 @@ def test_unrejected() -> None:
         documents=None,  # type: ignore[ty:invalid-argument-type]
         tasks=None,  # type: ignore[ty:invalid-argument-type]
         predictions=None,  # type: ignore[ty:invalid-argument-type]
-        reviews=[
+        reviews=(
             Review(
                 id=None,  # type: ignore[ty:invalid-argument-type]
                 reviewer_id=None,  # type: ignore[ty:invalid-argument-type]
@@ -49,7 +49,7 @@ def test_unrejected() -> None:
                 rejected=False,
                 type=None,  # type: ignore[ty:invalid-argument-type]
             ),
-        ],
+        ),
     )
 
     assert not result.rejected

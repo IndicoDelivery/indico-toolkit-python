@@ -140,7 +140,7 @@ class Extractions:
         """
         Get the highest confidence prediction for a given field
         """
-        max_pred = None
+        max_pred = {}
         confidence = 0
         for pred in self[label]:
             pred_confidence = pred["confidence"][label]
