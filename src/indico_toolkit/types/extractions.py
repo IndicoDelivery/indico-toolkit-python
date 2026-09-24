@@ -29,7 +29,9 @@ class Extractions:
     def num_predictions(self) -> int:
         return len(self._preds)
 
-    def remove_by_confidence(self, confidence: float = 0.95, labels: List[str] = None):
+    def remove_by_confidence(
+        self, confidence: float = 0.95, labels: List[str] | None = None
+    ):
         """
         Remove predictions that are less than given confidence
         Args:

@@ -79,7 +79,7 @@ class FormExtraction(Extraction):
         """
         Create a prediction dictionary for auto review changes.
         """
-        prediction = {
+        prediction: "dict[str, Any]" = {
             **self.extras,
             "label": self.label,
             "confidence": self.confidences,

@@ -4,7 +4,7 @@ from .predictions import Predictions
 
 
 class WorkflowResult:
-    def __init__(self, result: dict, model_name: str = None):
+    def __init__(self, result: dict, model_name: str | None = None):
         """
         Common functionality for workflow result object
 

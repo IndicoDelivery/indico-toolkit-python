@@ -43,7 +43,7 @@ class Positioning:
         return is_above
 
     def positioned_above_overlap(
-        self, above_pos: dict, below_pos: dict, min_overlap_percent: float = None
+        self, above_pos: dict, below_pos: dict, min_overlap_percent: float | None = None
     ) -> bool:
         """
         Check if the location of one box is on the same page and above another and if
@@ -95,7 +95,7 @@ class Positioning:
         return same_level
 
     def get_min_distance(
-        self, pos1: dict, pos2: dict, page_height: int = None
+        self, pos1: dict, pos2: dict, page_height: int | None = None
     ) -> float:
         """
         Get the minimum distance between any two corners of two bounding boxes via the
@@ -217,7 +217,7 @@ class Positioning:
 
     @staticmethod
     def get_vertical_min_distance(
-        above_pos: dict, below_pos: dict, page_height: int = None
+        above_pos: dict, below_pos: dict, page_height: int | None = None
     ) -> float:
         """
         Get the vertical minimum distance between two bounding boxes
