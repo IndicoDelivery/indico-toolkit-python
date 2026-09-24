@@ -9,8 +9,8 @@ from indico.queries import (
 )
 from indico.types import Submission
 
-from ..retry import retry
 from .queries import SubmissionIdsPendingDownstream
+from .retry import retry
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
