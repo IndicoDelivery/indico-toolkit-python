@@ -5,7 +5,7 @@ import pytest
 from indico_toolkit import etloutput
 from indico_toolkit.etloutput import EtlOutput, Span, Table
 
-data_folder = Path(__file__).parent.parent / "data" / "etloutput"
+data_folder = Path(__file__).parent / "data"
 etl_output_file = data_folder / "4725" / "112731" / "112257" / "etl_output_rs_cs.json"
 
 

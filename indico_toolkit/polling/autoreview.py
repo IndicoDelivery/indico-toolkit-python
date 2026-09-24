@@ -14,8 +14,8 @@ from indico.queries import (
 from .. import etloutput, results
 from ..etloutput import EtlOutput
 from ..results import Document, Result
-from ..retry import retry
 from .queries import SubmissionIdsPendingAutoReview
+from .retry import retry
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable

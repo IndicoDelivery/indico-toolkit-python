@@ -4,7 +4,7 @@ import pytest
 
 from indico_toolkit import results
 
-data_folder = Path(__file__).parent.parent / "data" / "results"
+data_folder = Path(__file__).parent / "data"
 
 
 @pytest.mark.parametrize("result_file", list(data_folder.glob("*.json")))

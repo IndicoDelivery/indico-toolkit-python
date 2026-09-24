@@ -1,6 +1,5 @@
 import pytest
 
-from indico_toolkit.errors import ToolkitInputError
 from indico_toolkit.types import (
     Classification,
     ClassificationMGP,
@@ -10,7 +9,7 @@ from indico_toolkit.types import (
 
 
 def test_bad_type():
-    with pytest.raises(ToolkitInputError):
+    with pytest.raises(TypeError):
         Predictions.get_obj("Bad type")
 
 

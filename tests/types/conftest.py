@@ -12,14 +12,14 @@ from indico_toolkit.types import (
 
 @pytest.fixture(scope="module")
 def static_extract_results():
-    with open("tests/data/samples/fin_disc_result.json", "r") as infile:
+    with open("tests/types/data/fin_disc_result.json", "r") as infile:
         results = json.load(infile)
     return results
 
 
 @pytest.fixture(scope="module")
 def static_class_results():
-    with open("tests/data/samples/fin_disc_classification.json", "r") as infile:
+    with open("tests/types/data/fin_disc_classification.json", "r") as infile:
         results = json.load(infile)
     return results
 

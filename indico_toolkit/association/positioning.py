@@ -1,8 +1,6 @@
 from math import sqrt
 from typing import List
 
-from ..errors import ToolkitInputError
-
 
 class Positioning:
     """
@@ -64,7 +62,7 @@ class Positioning:
         is_above = False
         is_min_overlap = True
         if below_pos["page_num"] != above_pos["page_num"]:
-            raise ToolkitInputError("Predictions are not on the same page!")
+            raise ValueError("Predictions are not on the same page!")
         if self.xaxis_overlap(above_pos, below_pos) and self.yaxis_above(
             above_pos, below_pos
         ):
@@ -115,9 +113,7 @@ class Positioning:
         page_difference = abs(pos1["page_num"] - pos2["page_num"])
         if page_difference > 0:
             if not page_height:
-                raise ToolkitInputError(
-                    "Predictions are not on the same page! Must enter a page height"
-                )
+                raise ValueError("page_height required for preds on different pages")
             else:
                 add_page_height = True
         distances = []
@@ -146,7 +142,7 @@ class Positioning:
         """
         page_difference = abs(pos1["page_num"] - pos2["page_num"])
         if page_difference > 0:
-            raise ToolkitInputError("Predictions are not on the same page!")
+            raise ValueError("Predictions are not on the same page!")
         if self.xaxis_overlap(pos1, pos2):
             horizontal_overlap_distance = abs(
                 max(pos1["bbLeft"], pos2["bbLeft"])
@@ -165,7 +161,7 @@ class Positioning:
         """
         page_difference = abs(pos1["page_num"] - pos2["page_num"])
         if page_difference > 0:
-            raise ToolkitInputError("Predictions are not on the same page!")
+            raise ValueError("Predictions are not on the same page!")
         if self.yaxis_overlap(pos1, pos2):
             vertical_overlap_distance = abs(
                 max(pos1["bbTop"], pos2["bbTop"]) - min(pos1["bbBot"], pos2["bbBot"])
@@ -196,7 +192,7 @@ class Positioning:
             List[dict]: list of OCR tokens that fall within the specified bounding box
         """
         if "position" not in ocr_tokens[0] or "page_num" not in ocr_tokens[0]:
-            raise ToolkitInputError(
+            raise RuntimeError(
                 "Token list argument is missing required key(s): "
                 "page_num and/or position"
             )
@@ -240,9 +236,7 @@ class Positioning:
         page_difference = abs(above_pos["page_num"] - below_pos["page_num"])
         if page_difference > 0:
             if not page_height:
-                raise ToolkitInputError(
-                    "Predictions are not on the same page! Must enter a page height"
-                )
+                raise ValueError("page_height required for preds on different pages")
             else:
                 add_page_height = True
         min_distance = below_pos["bbTop"] - above_pos["bbBot"]
@@ -261,9 +255,7 @@ class Positioning:
         """
         page_difference = abs(pos1["page_num"] - pos2["page_num"])
         if page_difference > 0:
-            raise ToolkitInputError(
-                "Predictions are not on the same page! Must enter a page height"
-            )
+            raise ValueError("Predictions are not on the same page!")
 
         min_distance_1 = abs(pos1["bbLeft"] - pos2["bbRight"])
         min_distance_2 = abs(pos1["bbRight"] - pos2["bbLeft"])
