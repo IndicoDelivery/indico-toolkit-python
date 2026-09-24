@@ -1,63 +1,48 @@
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.11.0,<1.0.0"]
+build-backend = "uv_build"
 
 [project]
 name = "indico-toolkit"
-description = "Classes, functions, and abstractions for Indico IPA"
+description = "Indico Toolkit for Intake and Insights"
 license = "MIT"
-authors = [
-    { name = "Indico Solutions Engineering", email = "solutionsengineering@indicodata.ai" },
-]
 readme = "README.md"
-urls = { source = "https://github.com/IndicoDataSolutions/Indico-Solutions-Toolkit" }
-requires-python = ">=3.10"
-version = "7.2.3"
+urls = { source = "https://github.com/IndicoDelivery/indico-toolkit-python" }
+requires-python = ">=3.10,<4"
+version = "10.0.0"
 dependencies = ["indico-client (>=6.14.0,<8.0.0)"]
 
-[tool.poetry.group.dev.dependencies]
-black = "^25.1.0"
-coverage = "^7.6.12"
-mypy = "^1.15.0"
-pytest = "^8.3.4"
-pytest-asyncio = "^0.25.3"
-pytest-cov = "^6.0.0"
-pytest-mock = "^3.14.0"
-requests-mock = "^1.12.1"
-ruff = "^0.9.6"
-
-[tool.poetry.requires-plugins]
-poethepoet = {extras = ["poetry-plugin"], version = "^0.33.0"}
+[dependency-groups]
+dev = [
+    "coverage (>=7.0.0)",
+    "poethepoet (>=0.30.0)",
+    "pytest-asyncio (>=1.0.0)",
+    "pytest-cov (>=7.0.0)",
+    "pytest-mock (>=3.0.0)",
+    "pytest (>=9.0.0)",
+    "ruff (>=0.15.0)",
+    "ty (>=0.0.50)",
+]
 
 [tool.poe.tasks]
-black = "black indico_toolkit examples tests"
-black-check = "black --check indico_toolkit examples tests"
 coverage = "coverage html"
-mypy = "mypy indico_toolkit tests"
-pytest = "pytest tests --cov=indico_toolkit"
-pytest-unit = "pytest tests --ignore tests/integration --cov=indico_toolkit"
-ruff = "ruff check --fix-only --exit-zero indico_toolkit examples tests"
-ruff-check = "ruff check indico_toolkit examples tests"
-test-integration = "pytest tests/integration --cov=indico_toolkit"
+pytest = "pytest tests --cov=src --cov=tests"
+ruff-check = "ruff check src tests"
+ruff-fix = "ruff check --fix-only src tests"
+ruff-format = "ruff format src tests"
+ruff-format-check = "ruff format --check src tests"
+ty = "ty check src tests"
+ty-fix = "ty check --fix src tests"
 
-format = ["ruff", "black"]
-check = ["ruff-check", "black-check", "mypy"]
-test = ["pytest-unit", "coverage"]
+format = ["ruff-fix", "ruff-format"]
+check = ["ruff-check", "ruff-format-check", "ty"]
+test = ["pytest", "coverage"]
 all = ["format", "check", "test"]
-
-[tool.black]
-line-length = 88
 
 [tool.ruff]
 line-length = 88
 lint.select = ["E", "F", "I"]
 lint.fixable = ["I"]
-
-[tool.mypy]
-strict = true
-show_error_codes = true
-warn_unreachable = true
-disallow_any_unimported = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
