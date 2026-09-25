@@ -1,25 +1,25 @@
 import asyncio
 import time
+from collections.abc import Awaitable, Callable
 from functools import wraps
 from inspect import iscoroutinefunction
 from random import random
-from typing import TYPE_CHECKING, overload
+from typing import ParamSpec, TypeVar, overload
 
-if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable
-    from typing import ParamSpec, TypeVar
-
-    ArgumentsType = ParamSpec("ArgumentsType")
-    ReturnType = TypeVar("ReturnType")
+ArgumentsType = ParamSpec("ArgumentsType")
+ReturnType = TypeVar("ReturnType")
 
 
 def retry(
-    *errors: "type[Exception]",
+    *errors: type[Exception],
     count: int = 4,
     wait: float = 1,
     backoff: float = 4,
     jitter: float = 0.5,
-) -> "Callable[[Callable[ArgumentsType, ReturnType]], Callable[ArgumentsType, ReturnType]]":  # noqa: E501
+) -> Callable[
+    [Callable[ArgumentsType, ReturnType]],
+    Callable[ArgumentsType, ReturnType],
+]:
     """
     Decorate a function or coroutine to retry when it raises specified errors,
     apply exponential backoff and jitter to the wait time,
@@ -45,15 +45,18 @@ def retry(
 
     @overload
     def retry_decorator(
-        decorated: "Callable[ArgumentsType, Awaitable[ReturnType]]",
-    ) -> "Callable[ArgumentsType, Awaitable[ReturnType]]": ...
+        decorated: Callable[ArgumentsType, Awaitable[ReturnType]],
+    ) -> Callable[ArgumentsType, Awaitable[ReturnType]]: ...
     @overload
     def retry_decorator(
-        decorated: "Callable[ArgumentsType, ReturnType]",
-    ) -> "Callable[ArgumentsType, ReturnType]": ...
+        decorated: Callable[ArgumentsType, ReturnType],
+    ) -> Callable[ArgumentsType, ReturnType]: ...
     def retry_decorator(
-        decorated: "Callable[ArgumentsType, ReturnType]",
-    ) -> "Callable[ArgumentsType, Awaitable[ReturnType]] | Callable[ArgumentsType, ReturnType]":  # noqa: E501
+        decorated: Callable[ArgumentsType, ReturnType],
+    ) -> (
+        Callable[ArgumentsType, Awaitable[ReturnType]]
+        | Callable[ArgumentsType, ReturnType]
+    ):
         """
         Decorate either a function or coroutine as appropriate.
         """
@@ -61,8 +64,8 @@ def retry(
 
             @wraps(decorated)
             async def retrying_coroutine(  # type: ignore[return]
-                *args: "ArgumentsType.args", **kwargs: "ArgumentsType.kwargs"
-            ) -> "ReturnType":  # type: ignore[ty:invalid-return-type]
+                *args: ArgumentsType.args, **kwargs: ArgumentsType.kwargs
+            ) -> ReturnType:  # type: ignore[ty:invalid-return-type]
                 for times_retried in range(count + 1):
                     try:
                         return await decorated(*args, **kwargs)  # type: ignore[no-any-return]
@@ -77,8 +80,8 @@ def retry(
 
             @wraps(decorated)
             def retrying_function(  # type: ignore[return]
-                *args: "ArgumentsType.args", **kwargs: "ArgumentsType.kwargs"
-            ) -> "ReturnType":  # type: ignore[ty:invalid-return-type]
+                *args: ArgumentsType.args, **kwargs: ArgumentsType.kwargs
+            ) -> ReturnType:  # type: ignore[ty:invalid-return-type]
                 for times_retried in range(count + 1):
                     try:
                         return decorated(*args, **kwargs)

@@ -1,22 +1,20 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
+from ..document import Document
+from ..review import Review
+from ..task import Task
 from ..utils import get, omit
 from .prediction import Prediction
-
-if TYPE_CHECKING:
-    from ..document import Document
-    from ..review import Review
-    from ..task import Task
 
 
 @dataclass
 class Classification(Prediction):
     @staticmethod
     def from_dict(
-        document: "Document",
-        task: "Task",
-        review: "Review | None",
+        document: Document,
+        task: Task,
+        review: Review | None,
         prediction: object,
     ) -> "Classification":
         """
@@ -31,7 +29,7 @@ class Classification(Prediction):
             extras=omit(prediction, "label", "confidence"),
         )
 
-    def to_dict(self) -> "dict[str, Any]":
+    def to_dict(self) -> dict[str, Any]:
         """
         Create a prediction dictionary for auto review changes.
         """

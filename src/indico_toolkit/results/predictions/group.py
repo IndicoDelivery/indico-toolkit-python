@@ -26,7 +26,7 @@ class Group:
             index=get(group, int, "group_index"),
         )
 
-    def to_dict(self) -> "dict[str, Any]":
+    def to_dict(self) -> dict[str, Any]:
         return {
             "group_id": f"{self.id}:{self.name}",
             "group_name": self.name,

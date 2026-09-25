@@ -26,7 +26,7 @@ class Citation:
             span=Span.from_dict(get(span, dict, "document")),
         )
 
-    def to_dict(self) -> "dict[str, Any]":
+    def to_dict(self) -> dict[str, Any]:
         return {
             "response": {
                 "start": self.start,

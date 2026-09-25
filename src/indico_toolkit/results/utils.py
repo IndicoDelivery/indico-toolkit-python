@@ -14,9 +14,9 @@ __all__ = (
 
 
 def nfilter(
-    predicates: "Iterable[Callable[[Value], bool]]",
-    values: "Iterable[Value]",
-) -> "Iterator[Value]":
+    predicates: Iterable[Callable[[Value], bool]],
+    values: Iterable[Value],
+) -> Iterator[Value]:
     """
     Apply multiple filter predicates to an iterable of values.
 
@@ -29,7 +29,7 @@ def nfilter(
     yield from values
 
 
-def omit(dictionary: object, *keys: str) -> "dict[str, Value]":
+def omit(dictionary: object, *keys: str) -> dict[str, Value]:
     """
     Return a shallow copy of `dictionary` with `keys` omitted.
     """

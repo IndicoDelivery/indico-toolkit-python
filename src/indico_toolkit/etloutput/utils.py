@@ -4,7 +4,7 @@ from typing import Any, TypeVar
 Value = TypeVar("Value")
 
 
-def get(value: object, value_type: "type[Value]", *keys: "str | int") -> Value:
+def get(value: object, value_type: type[Value], *keys: str | int) -> Value:
     """
     Return the value of type `value_type` obtained by traversing `value` using `keys`.
     Raise an error if a key doesn't exist or the value has the wrong type.
@@ -32,7 +32,7 @@ def get(value: object, value_type: "type[Value]", *keys: "str | int") -> Value:
         raise TypeError(f"value `{value!r}` doesn't have type {value_type}")
 
 
-def has(value: object, value_type: "type[Value]", *keys: "str | int") -> bool:
+def has(value: object, value_type: type[Value], *keys: str | int) -> bool:
     """
     Check if `value` can be traversed using `keys` to a value of type `value_type`.
     """
@@ -47,7 +47,7 @@ def has(value: object, value_type: "type[Value]", *keys: "str | int") -> bool:
     return isinstance(value, value_type)
 
 
-def json_loaded(value: "Any") -> "Any":
+def json_loaded(value: Any) -> Any:
     """
     Ensure `value` has been loaded as JSON.
     """

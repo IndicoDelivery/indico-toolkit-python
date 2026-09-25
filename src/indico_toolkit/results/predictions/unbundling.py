@@ -1,31 +1,27 @@
 from copy import copy
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import Any, Self
 
 from ...etloutput import Span
+from ..document import Document
+from ..review import Review
+from ..task import Task
 from ..utils import get, omit
 from .prediction import Prediction
-
-if TYPE_CHECKING:
-    from typing_extensions import Self
-
-    from ..document import Document
-    from ..review import Review
-    from ..task import Task
 
 
 @dataclass
 class Unbundling(Prediction):
-    spans: "list[Span]"
+    spans: list[Span]
 
     @property
-    def pages(self) -> "tuple[int, ...]":
+    def pages(self) -> tuple[int, ...]:
         """
         Return the pages covered by `self.spans`.
         """
         return tuple(span.page for span in self.spans)
 
-    def __deepcopy__(self, memo: Any) -> "Self":
+    def __deepcopy__(self, memo: Any) -> Self:
         """
         Supports `copy.deepcopy(prediction)` without copying immutable objects.
         """
@@ -35,9 +31,9 @@ class Unbundling(Prediction):
 
     @staticmethod
     def from_dict(
-        document: "Document",
-        task: "Task",
-        review: "Review | None",
+        document: Document,
+        task: Task,
+        review: Review | None,
         prediction: object,
     ) -> "Unbundling":
         """
@@ -53,7 +49,7 @@ class Unbundling(Prediction):
             extras=omit(prediction, "confidence", "label", "spans"),
         )
 
-    def to_dict(self) -> "dict[str, Any]":
+    def to_dict(self) -> dict[str, Any]:
         """
         Create a prediction dictionary for auto review changes.
         """

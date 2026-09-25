@@ -19,7 +19,7 @@ class Cell:
     text: str
     box: Box
     range: Range
-    spans: "tuple[Span, ...]"
+    spans: tuple[Span, ...]
 
     def __bool__(self) -> bool:
         return self != NULL_CELL

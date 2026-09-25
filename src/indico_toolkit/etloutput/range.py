@@ -10,8 +10,8 @@ class Range:
     column: int
     rowspan: int
     columnspan: int
-    rows: "tuple[int, ...]"
-    columns: "tuple[int, ...]"
+    rows: tuple[int, ...]
+    columns: tuple[int, ...]
 
     def __bool__(self) -> bool:
         return self != NULL_RANGE

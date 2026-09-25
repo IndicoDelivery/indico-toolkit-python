@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING, TypeAlias, TypeVar
+from collections.abc import Awaitable, Callable
+from typing import TypeAlias, TypeVar
 
 from .box import NULL_BOX, Box
 from .cell import NULL_CELL, Cell, CellType
@@ -8,9 +9,6 @@ from .span import NULL_SPAN, Span
 from .table import NULL_TABLE, Table
 from .token import NULL_TOKEN, Token
 from .utils import get, has, json_loaded, str_decoded
-
-if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable
 
 __all__ = (
     "Box",
@@ -31,15 +29,15 @@ __all__ = (
     "Token",
 )
 
-Loadable: TypeAlias = "dict[str, object] | list[object] | str | bytes"
+Loadable: TypeAlias = dict[str, object] | list[object] | str | bytes
 Readable = TypeVar("Readable")
 URI: TypeAlias = str
 
 
 def load(
-    etl_output: "Loadable | Readable",
+    etl_output: Loadable | Readable,
     *,
-    reader: "Callable[[Readable | URI], Loadable]",
+    reader: Callable[[Readable | URI], Loadable],
     text: bool = True,
     tokens: bool = True,
     tables: bool = True,
@@ -99,9 +97,9 @@ def load(
 
 
 async def load_async(
-    etl_output: "Loadable | Readable",
+    etl_output: Loadable | Readable,
     *,
-    reader: "Callable[[Readable | URI], Awaitable[Loadable]]",
+    reader: Callable[[Readable | URI], Awaitable[Loadable]],
     text: bool = True,
     tokens: bool = True,
     tables: bool = True,

@@ -1,8 +1,9 @@
 import sys
-from typing import TYPE_CHECKING
 
+from ..document import Document
 from ..normalization import normalize_prediction_dict
-from ..task import TaskType
+from ..review import Review
+from ..task import Task, TaskType
 from .citation import NULL_CITATION, Citation
 from .classification import Classification
 from .documentextraction import DocumentExtraction
@@ -12,11 +13,6 @@ from .group import Group
 from .prediction import Prediction
 from .summarization import Summarization
 from .unbundling import Unbundling
-
-if TYPE_CHECKING:
-    from ..document import Document
-    from ..review import Review
-    from ..task import Task
 
 __all__ = (
     "Citation",
@@ -34,11 +30,11 @@ __all__ = (
 
 
 def from_dict(
-    document: "Document",
-    task: "Task",
-    review: "Review | None",
+    document: Document,
+    task: Task,
+    review: Review | None,
     prediction: object,
-) -> "Prediction":
+) -> Prediction:
     """
     Create a `Prediction` subclass from a prediction dictionary.
     """

@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING, TypeAlias, TypeVar, overload
+from collections.abc import Awaitable, Callable
+from typing import TypeAlias, TypeVar, overload
 
 from ..etloutput import NULL_BOX, NULL_SPAN, Box, Span
 from .document import Document
@@ -19,10 +20,6 @@ from .result import Result
 from .review import Review, ReviewType
 from .task import Task, TaskType
 from .utils import json_loaded
-
-if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable
-
 
 __all__ = (
     "Box",
@@ -50,15 +47,15 @@ __all__ = (
     "Unbundling",
 )
 
-Loadable: TypeAlias = "dict[str, object] | str | bytes"
+Loadable: TypeAlias = dict[str, object] | str | bytes
 Readable = TypeVar("Readable")
 
 
 @overload
 def load(result: Loadable) -> Result: ...
 @overload
-def load(result: Readable, *, reader: "Callable[[Readable], Loadable]") -> Result: ...
-def load(result: object, *, reader: "Callable[..., object] | None" = None) -> Result:
+def load(result: Readable, *, reader: Callable[[Readable], Loadable]) -> Result: ...
+def load(result: object, *, reader: Callable[..., object] | None = None) -> Result:
     """
     Load `result` as a `Result` dataclass. `result` can be a dict or JSON string/bytes.
 
@@ -79,10 +76,10 @@ def load(result: object, *, reader: "Callable[..., object] | None" = None) -> Re
 async def load_async(result: Loadable) -> Result: ...
 @overload
 async def load_async(
-    result: Readable, *, reader: "Callable[[Readable], Awaitable[Loadable]]"
+    result: Readable, *, reader: Callable[[Readable], Awaitable[Loadable]]
 ) -> Result: ...
 async def load_async(
-    result: object, *, reader: "Callable[..., Awaitable[object]] | None" = None
+    result: object, *, reader: Callable[..., Awaitable[object]] | None = None
 ) -> Result:
     """
     Load `result` as a `Result` dataclass. `result` can be a dict or JSON string/bytes.

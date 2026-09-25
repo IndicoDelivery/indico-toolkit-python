@@ -11,10 +11,10 @@ from .utils import get
 @dataclass(frozen=True)
 class Table:
     box: Box
-    spans: "tuple[Span, ...]"
-    cells: "tuple[Cell, ...]"
-    rows: "tuple[tuple[Cell, ...], ...]"
-    columns: "tuple[tuple[Cell, ...], ...]"
+    spans: tuple[Span, ...]
+    cells: tuple[Cell, ...]
+    rows: tuple[tuple[Cell, ...], ...]
+    columns: tuple[tuple[Cell, ...], ...]
 
     def __bool__(self) -> bool:
         return self != NULL_TABLE

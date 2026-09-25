@@ -1,24 +1,21 @@
 from copy import copy, deepcopy
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import Any, Self
 
-if TYPE_CHECKING:
-    from typing_extensions import Self
-
-    from ..document import Document
-    from ..review import Review
-    from ..task import Task
+from ..document import Document
+from ..review import Review
+from ..task import Task
 
 
 @dataclass
 class Prediction:
-    document: "Document"
-    task: "Task"
-    review: "Review | None"
+    document: Document
+    task: Task
+    review: Review | None
 
     label: str
-    confidences: "dict[str, float]"
-    extras: "dict[str, Any]"
+    confidences: dict[str, float]
+    extras: dict[str, Any]
 
     @property
     def confidence(self) -> float:
@@ -28,7 +25,7 @@ class Prediction:
     def confidence(self, value: float) -> None:
         self.confidences[self.label] = value
 
-    def __deepcopy__(self, memo: Any) -> "Self":
+    def __deepcopy__(self, memo: Any) -> Self:
         """
         Supports `copy.deepcopy(prediction)` without copying immutable objects.
         """
@@ -37,7 +34,7 @@ class Prediction:
         new_instance.extras = deepcopy(self.extras, memo)
         return new_instance
 
-    def __replace__override__(self, **attributes: Any) -> "Self":
+    def __replace__override__(self, **attributes: Any) -> Self:
         """
         Supports `copy.replace(prediction, **attrs)` on Python 3.13+
 
@@ -57,7 +54,7 @@ class Prediction:
 
         return new_instance
 
-    def to_dict(self) -> "dict[str, Any]":
+    def to_dict(self) -> dict[str, Any]:
         """
         Create a prediction dictionary for auto review changes.
         """

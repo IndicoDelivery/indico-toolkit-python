@@ -1,15 +1,11 @@
 import asyncio
 import logging
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import Any, NoReturn, TypeAlias
 
 from indico import AsyncIndicoClient, IndicoConfig
-from indico.queries import (
-    GetSubmission,
-    JobStatus,
-    RetrieveStorageObject,
-    SubmitReview,
-)
+from indico.queries import GetSubmission, JobStatus, RetrieveStorageObject, SubmitReview
 
 from .. import etloutput, results
 from ..etloutput import EtlOutput
@@ -17,20 +13,16 @@ from ..results import Document, Result
 from .queries import SubmissionIdsPendingAutoReview
 from .retry import retry
 
-if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable
-    from typing import Any, NoReturn, TypeAlias
-
-    SubmissionId: TypeAlias = int
-    Worker: TypeAlias = asyncio.Task[None]
-    WorkerQueue: TypeAlias = asyncio.Queue[tuple[SubmissionId, Worker]]
+SubmissionId: TypeAlias = int
+Worker: TypeAlias = asyncio.Task[None]
+WorkerQueue: TypeAlias = asyncio.Queue[tuple[SubmissionId, Worker]]
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class AutoReviewed:
-    changes: "list[dict[str, Any]]"
+    changes: list[dict[str, Any]]
     reject: bool = False
     stp: bool = False
 
@@ -45,7 +37,10 @@ class AutoReviewPoller:
         self,
         config: IndicoConfig,
         workflow_id: int,
-        auto_review: "Callable[[Result, dict[Document, EtlOutput]], Awaitable[AutoReviewed]]",  # noqa: E501
+        auto_review: Callable[
+            [Result, dict[Document, EtlOutput]],
+            Awaitable[AutoReviewed],
+        ],
         *,
         worker_count: int = 8,
         spawn_rate: float = 1,
@@ -78,10 +73,10 @@ class AutoReviewPoller:
             jitter=retry_jitter,
         )
         self._worker_slots = asyncio.Semaphore(worker_count)
-        self._worker_queue: "WorkerQueue" = asyncio.Queue(1)
-        self._processing_submission_ids: "set[SubmissionId]" = set()
+        self._worker_queue: WorkerQueue = asyncio.Queue(1)
+        self._processing_submission_ids: set[SubmissionId] = set()
 
-    async def poll_forever(self) -> "NoReturn":  # type: ignore[misc]
+    async def poll_forever(self) -> NoReturn:  # type: ignore[misc]
         logger.info(
             "Starting auto review poller for: "
             f"host={self._config.host} "
@@ -98,7 +93,7 @@ class AutoReviewPoller:
 
         assert False, "NoReturn"
 
-    async def _retrieve_storage_object(self, uri: str) -> "Any":
+    async def _retrieve_storage_object(self, uri: str) -> Any:
         return await self._client_call(RetrieveStorageObject(uri))
 
     async def _spawn_workers(self) -> None:
@@ -113,7 +108,7 @@ class AutoReviewPoller:
 
         while True:
             try:
-                submission_ids: "set[SubmissionId]" = await self._client_call(
+                submission_ids: set[SubmissionId] = await self._client_call(
                     SubmissionIdsPendingAutoReview(self._workflow_id)
                 )
             except Exception:
@@ -135,7 +130,7 @@ class AutoReviewPoller:
                 await self._worker_queue.put((submission_id, worker))
                 await asyncio.sleep(1 / self._spawn_rate)
 
-    async def _worker(self, submission_id: "SubmissionId") -> None:
+    async def _worker(self, submission_id: SubmissionId) -> None:
         """
         Process a single submission by retrieving submission metadata, the result file,
         etl output, calling `self._auto_review`, and submitting changes.

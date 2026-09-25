@@ -1,6 +1,7 @@
+from collections.abc import Iterable, Iterator
 from copy import copy
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import Any, Self
 
 from ...etloutput import (
     NULL_CELL,
@@ -12,28 +13,22 @@ from ...etloutput import (
     Table,
     Token,
 )
+from ..document import Document
+from ..review import Review
+from ..task import Task
 from ..utils import get, has, omit
 from .extraction import Extraction
 from .group import Group
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
-
-    from typing_extensions import Self
-
-    from ..document import Document
-    from ..review import Review
-    from ..task import Task
-
 
 @dataclass
 class DocumentExtraction(Extraction):
-    groups: "set[Group]"
-    spans: "list[Span]"
+    groups: set[Group]
+    spans: list[Span]
 
-    tokens: "list[Token]" = field(default_factory=list)
-    tables: "list[Table]" = field(default_factory=list)
-    cells: "list[Cell]" = field(default_factory=list)
+    tokens: list[Token] = field(default_factory=list)
+    tables: list[Table] = field(default_factory=list)
+    cells: list[Cell] = field(default_factory=list)
 
     @property
     def span(self) -> Span:
@@ -109,14 +104,14 @@ class DocumentExtraction(Extraction):
         self.cells = [cell] if cell else []
 
     @property
-    def table_cells(self) -> "Iterator[tuple[Table, Cell]]":
+    def table_cells(self) -> Iterator[tuple[Table, Cell]]:
         """
         Yield the table cells the document extraction is in.
         """
         yield from zip(self.tables, self.cells)
 
     @table_cells.setter
-    def table_cells(self, table_cells: "Iterable[tuple[Table, Cell]]") -> None:
+    def table_cells(self, table_cells: Iterable[tuple[Table, Cell]]) -> None:
         """
         Set the tables cells the document extraction is in.
 
@@ -131,7 +126,7 @@ class DocumentExtraction(Extraction):
                 self.tables.append(table)
                 self.cells.append(cell)
 
-    def __deepcopy__(self, memo: Any) -> "Self":
+    def __deepcopy__(self, memo: Any) -> Self:
         """
         Supports `copy.deepcopy(prediction)` without copying immutable objects.
         This provides a significant time and memory improvement when OCR is assigned.
@@ -146,9 +141,9 @@ class DocumentExtraction(Extraction):
 
     @staticmethod
     def from_dict(
-        document: "Document",
-        task: "Task",
-        review: "Review | None",
+        document: Document,
+        task: Task,
+        review: Review | None,
         prediction: object,
     ) -> "DocumentExtraction":
         """
@@ -180,11 +175,11 @@ class DocumentExtraction(Extraction):
             ),
         )
 
-    def to_dict(self) -> "dict[str, Any]":
+    def to_dict(self) -> dict[str, Any]:
         """
         Create a prediction dictionary for auto review changes.
         """
-        prediction: "dict[str, Any]" = {
+        prediction: dict[str, Any] = {
             **self.extras,
             "label": self.label,
             "confidence": self.confidences,

@@ -1,23 +1,19 @@
 from copy import copy
 from dataclasses import dataclass, replace
-from typing import TYPE_CHECKING, Any
+from typing import Any, Self
 
+from ...etloutput import Span
+from ..document import Document
+from ..review import Review
+from ..task import Task
 from ..utils import get, has, omit
 from .citation import NULL_CITATION, Citation
 from .extraction import Extraction
 
-if TYPE_CHECKING:
-    from typing_extensions import Self
-
-    from ...etloutput import Span
-    from ..document import Document
-    from ..review import Review
-    from ..task import Task
-
 
 @dataclass
 class Summarization(Extraction):
-    citations: "list[Citation]"
+    citations: list[Citation]
 
     @property
     def citation(self) -> Citation:
@@ -39,14 +35,14 @@ class Summarization(Extraction):
         self.citations = [citation] if citation else []
 
     @property
-    def spans(self) -> "tuple[Span, ...]":
+    def spans(self) -> tuple[Span, ...]:
         """
         Return the `Span`s covered by `self.citations`.
         """
         return tuple(citation.span for citation in self.citations)
 
     @property
-    def span(self) -> "Span":
+    def span(self) -> Span:
         """
         Return the `Span` the first citation covers else `NULL_SPAN`.
 
@@ -55,7 +51,7 @@ class Summarization(Extraction):
         return self.citation.span
 
     @span.setter
-    def span(self, span: "Span") -> None:
+    def span(self, span: Span) -> None:
         """
         Overwrite all citations with the first,
         replacing its span with the one provided.
@@ -70,7 +66,7 @@ class Summarization(Extraction):
         """
         self.citation = replace(self.citation, span=span)
 
-    def __deepcopy__(self, memo: Any) -> "Self":
+    def __deepcopy__(self, memo: Any) -> Self:
         """
         Supports `copy.deepcopy(prediction)` without copying immutable objects.
         """
@@ -80,9 +76,9 @@ class Summarization(Extraction):
 
     @staticmethod
     def from_dict(
-        document: "Document",
-        task: "Task",
-        review: "Review | None",
+        document: Document,
+        task: Task,
+        review: Review | None,
         prediction: object,
     ) -> "Summarization":
         """
@@ -115,7 +111,7 @@ class Summarization(Extraction):
             ),
         )
 
-    def to_dict(self) -> "dict[str, Any]":
+    def to_dict(self) -> dict[str, Any]:
         """
         Create a prediction dictionary for auto review changes.
         """

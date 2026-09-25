@@ -18,8 +18,8 @@ class Document:
     # produce predictions or if all of the predictions for that section were dropped.
     # As such, the model and component IDs seen when parsing a result file are tracked
     # per-document so that the empty sections can be reproduced later.
-    _model_ids: "frozenset[str]"
-    _component_ids: "frozenset[str]"
+    _model_ids: frozenset[str]
+    _component_ids: frozenset[str]
 
     @staticmethod
     def from_dict(document: object) -> "Document":

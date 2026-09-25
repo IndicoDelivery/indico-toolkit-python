@@ -5,7 +5,7 @@ from .task import TaskType
 from .utils import get, has
 
 
-def normalize_result_dict(result: "Any") -> None:
+def normalize_result_dict(result: Any) -> None:
     """
     Fix inconsistencies observed in result file structure.
     """
@@ -29,7 +29,7 @@ def normalize_result_dict(result: "Any") -> None:
             review["review_notes"] = ""
 
 
-def normalize_prediction_dict(task_type: TaskType, prediction: "Any") -> None:
+def normalize_prediction_dict(task_type: TaskType, prediction: Any) -> None:
     """
     Fix inconsistencies observed in prediction structure.
     """

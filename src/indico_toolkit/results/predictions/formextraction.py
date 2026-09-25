@@ -1,15 +1,13 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from ...etloutput import Box
+from ..document import Document
+from ..review import Review
+from ..task import Task
 from ..utils import get, has, omit
 from .extraction import Extraction
-
-if TYPE_CHECKING:
-    from ..document import Document
-    from ..review import Review
-    from ..task import Task
 
 
 class FormExtractionType(Enum):
@@ -27,9 +25,9 @@ class FormExtraction(Extraction):
 
     @staticmethod
     def from_dict(
-        document: "Document",
-        task: "Task",
-        review: "Review | None",
+        document: Document,
+        task: Task,
+        review: Review | None,
         prediction: object,
     ) -> "FormExtraction":
         """
@@ -75,11 +73,11 @@ class FormExtraction(Extraction):
             ),
         )
 
-    def to_dict(self) -> "dict[str, Any]":
+    def to_dict(self) -> dict[str, Any]:
         """
         Create a prediction dictionary for auto review changes.
         """
-        prediction: "dict[str, Any]" = {
+        prediction: dict[str, Any] = {
             **self.extras,
             "label": self.label,
             "confidence": self.confidences,

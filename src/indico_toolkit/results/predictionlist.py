@@ -1,8 +1,11 @@
 from collections import defaultdict
+from collections.abc import Callable, Collection, Container, Iterable, Mapping
 from itertools import chain
 from operator import attrgetter
-from typing import TYPE_CHECKING, Any, Final, List, SupportsIndex, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Final, Self, SupportsIndex, TypeVar, overload
 
+from ..etloutput import EtlOutput
+from .document import Document
 from .predictions import (
     Classification,
     DocumentExtraction,
@@ -14,17 +17,11 @@ from .predictions import (
     Unbundling,
 )
 from .review import Review, ReviewType
+from .task import Task, TaskType
 from .utils import nfilter
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Collection, Container, Iterable, Mapping
-
-    from typing_extensions import Self
-
-    from ..etloutput import EtlOutput
-    from .document import Document
     from .result import Result
-    from .task import Task, TaskType
 
 PredictionType = TypeVar("PredictionType", bound=Prediction)
 OfType = TypeVar("OfType", bound=Prediction)
@@ -40,7 +37,7 @@ REVIEW_UNSPECIFIED: Final = Review(
 )
 
 
-class PredictionList(List[PredictionType]):
+class PredictionList(list[PredictionType]):
     @property
     def classifications(self) -> "PredictionList[Classification]":
         return self.oftype(Classification)
@@ -66,20 +63,20 @@ class PredictionList(List[PredictionType]):
         return self.oftype(Unbundling)
 
     @overload
-    def __getitem__(self, index: "SupportsIndex", /) -> PredictionType: ...
+    def __getitem__(self, index: SupportsIndex, /) -> PredictionType: ...
 
     @overload
     def __getitem__(self, index: slice, /) -> "PredictionList[PredictionType]": ...
 
     def __getitem__(
-        self, index: "SupportsIndex | slice"
+        self, index: SupportsIndex | slice
     ) -> "PredictionType | PredictionList[PredictionType]":
         if isinstance(index, slice):
             return type(self)(super().__getitem__(index))
         else:
             return super().__getitem__(index)
 
-    def apply(self, function: "Callable[[PredictionType], None]") -> "Self":
+    def apply(self, function: Callable[[PredictionType], None]) -> Self:
         """
         Apply `function` to all predictions.
         """
@@ -90,11 +87,11 @@ class PredictionList(List[PredictionType]):
 
     def assign_ocr(
         self,
-        etl_outputs: "Mapping[Document, EtlOutput]",
+        etl_outputs: Mapping[Document, EtlOutput],
         *,
         tokens: bool = True,
         tables: bool = True,
-    ) -> "Self":
+    ) -> Self:
         """
         Assign OCR tokens, tables, and/or cells using `etl_outputs`.
 
@@ -125,9 +122,7 @@ class PredictionList(List[PredictionType]):
 
         return self
 
-    def groupby(
-        self, key: "Callable[[PredictionType], KeyType]"
-    ) -> "dict[KeyType, Self]":
+    def groupby(self, key: Callable[[PredictionType], KeyType]) -> dict[KeyType, Self]:
         """
         Group predictions into a dictionary using `key` to derive each prediction's key.
         E.g. `key=attrgetter("label")` or `key=attrgetter("task")`.
@@ -151,8 +146,8 @@ class PredictionList(List[PredictionType]):
         return grouped_predictions
 
     def groupbyiter(
-        self, keys: "Callable[[PredictionType], Iterable[KeyType]]"
-    ) -> "dict[KeyType, Self]":
+        self, keys: Callable[[PredictionType], Iterable[KeyType]]
+    ) -> dict[KeyType, Self]:
         """
         Group predictions into a dictionary using `keys` to derive an iterable of keys.
         E.g. `key=attrgetter("groups")` or `key=attrgetter("pages")`.
@@ -168,7 +163,7 @@ class PredictionList(List[PredictionType]):
 
         return grouped_predictions
 
-    def oftype(self, type: "type[OfType]") -> "PredictionList[OfType]":
+    def oftype(self, type: type[OfType]) -> "PredictionList[OfType]":
         """
         Return a new prediction list containing predictions of type `type`.
         """
@@ -176,10 +171,10 @@ class PredictionList(List[PredictionType]):
 
     def orderby(
         self,
-        key: "Callable[[PredictionType], Any]",
+        key: Callable[[PredictionType], Any],
         *,
         reverse: bool = False,
-    ) -> "Self":
+    ) -> Self:
         """
         Return a new prediction list with predictions sorted by `key`.
         """
@@ -187,25 +182,25 @@ class PredictionList(List[PredictionType]):
 
     def where(
         self,
-        predicate: "Callable[[PredictionType], bool] | None" = None,
+        predicate: Callable[[PredictionType], bool] | None = None,
         *,
-        document: "Document | None" = None,
-        document_in: "Container[Document] | None" = None,
-        task: "Task | TaskType | str | None" = None,
-        task_in: "Container[Task | TaskType | str] | None" = None,
-        review: "Review | ReviewType | None" = REVIEW_UNSPECIFIED,
-        review_in: "Container[Review | ReviewType | None]" = {REVIEW_UNSPECIFIED},
-        label: "str | None" = None,
-        label_in: "Container[str] | None" = None,
-        page: "int | None" = None,
-        page_in: "Collection[int] | None" = None,
-        min_confidence: "float | None" = None,
-        max_confidence: "float | None" = None,
-        accepted: "bool | None" = None,
-        rejected: "bool | None" = None,
-        checked: "bool | None" = None,
-        signed: "bool | None" = None,
-    ) -> "Self":
+        document: Document | None = None,
+        document_in: Container[Document] | None = None,
+        task: Task | TaskType | str | None = None,
+        task_in: Container[Task | TaskType | str] | None = None,
+        review: Review | ReviewType | None = REVIEW_UNSPECIFIED,
+        review_in: Container[Review | ReviewType | None] = {REVIEW_UNSPECIFIED},
+        label: str | None = None,
+        label_in: Container[str] | None = None,
+        page: int | None = None,
+        page_in: Collection[int] | None = None,
+        min_confidence: float | None = None,
+        max_confidence: float | None = None,
+        accepted: bool | None = None,
+        rejected: bool | None = None,
+        checked: bool | None = None,
+        signed: bool | None = None,
+    ) -> Self:
         """
         Return a new prediction list containing predictions that match
         all of the specified filters.
@@ -351,47 +346,47 @@ class PredictionList(List[PredictionType]):
 
         return type(self)(nfilter(predicates, self))
 
-    def accept(self) -> "Self":
+    def accept(self) -> Self:
         """
         Mark extractions as accepted for auto review.
         """
         self.oftype(Extraction).apply(Extraction.accept)
         return self
 
-    def unaccept(self) -> "Self":
+    def unaccept(self) -> Self:
         """
         Mark extractions as not accepted for auto review.
         """
         self.oftype(Extraction).apply(Extraction.unaccept)
         return self
 
-    def reject(self) -> "Self":
+    def reject(self) -> Self:
         """
         Mark extractions as rejected for auto review.
         """
         self.oftype(Extraction).apply(Extraction.reject)
         return self
 
-    def unreject(self) -> "Self":
+    def unreject(self) -> Self:
         """
         Mark extractions as not rejected for auto review.
         """
         self.oftype(Extraction).apply(Extraction.unreject)
         return self
 
-    def to_changes(self, result: "Result") -> "list[dict[str, Any]]":
+    def to_changes(self, result: "Result") -> list[dict[str, Any]]:
         """
         Create a list for the `changes` argument of `SubmitReview` based on the
         predictions in this prediction list and the documents in `result`.
         """
-        changes: "list[dict[str, Any]]" = []
+        changes: list[dict[str, Any]] = []
 
         for document in result.documents:
             if document.failed:
                 continue
 
-            model_results: "dict[str, Any]" = {}
-            component_results: "dict[str, Any]" = {}
+            model_results: dict[str, Any] = {}
+            component_results: dict[str, Any] = {}
 
             predictions_by_task = self.where(
                 document=document,

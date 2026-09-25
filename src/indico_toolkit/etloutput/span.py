@@ -45,7 +45,7 @@ class Span:
             end=get(span, int, "end"),
         )
 
-    def to_dict(self) -> "dict[str, Any]":
+    def to_dict(self) -> dict[str, Any]:
         return {
             "page_num": self.page,
             "start": self.start,

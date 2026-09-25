@@ -1,38 +1,34 @@
 import itertools
 from bisect import bisect_left, bisect_right
 from collections import namedtuple
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from functools import cached_property
 from operator import attrgetter
-from typing import TYPE_CHECKING
 
 from .box import Box
+from .cell import Cell
+from .span import Span
 from .table import Table
 from .token import NULL_TOKEN, Token
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
-
-    from .cell import Cell
-    from .span import Span
 
 
 @dataclass(frozen=True)
 class EtlOutput:
     text: str
-    text_on_page: "tuple[str, ...]"
+    text_on_page: tuple[str, ...]
 
-    tokens: "tuple[Token, ...]"
-    tokens_on_page: "tuple[tuple[Token, ...], ...]"
+    tokens: tuple[Token, ...]
+    tokens_on_page: tuple[tuple[Token, ...], ...]
 
-    tables: "tuple[Table, ...]"
-    tables_on_page: "tuple[tuple[Table, ...], ...]"
+    tables: tuple[Table, ...]
+    tables_on_page: tuple[tuple[Table, ...], ...]
 
     @staticmethod
     def from_pages(
-        text_pages: "Iterable[str]",
-        token_dict_pages: "Iterable[Iterable[object]]",
-        table_dict_pages: "Iterable[Iterable[object]]",
+        text_pages: Iterable[str],
+        token_dict_pages: Iterable[Iterable[object]],
+        table_dict_pages: Iterable[Iterable[object]],
     ) -> "EtlOutput":
         """
         Create an `EtlOutput` from pages of text, tokens, and tables.
@@ -56,7 +52,7 @@ class EtlOutput:
             tables_on_page=table_pages,
         )
 
-    def token_for(self, span: "Span") -> Token:
+    def token_for(self, span: Span) -> Token:
         """
         Return a `Token` that contains every character from `span`
         or `NULL_TOKEN` if one doesn't exist.
@@ -85,7 +81,7 @@ class EtlOutput:
     _TableCellSpan = namedtuple("_TableCellSpan", ["table", "cell", "span"])
 
     @cached_property
-    def _table_cell_spans_on_page(self) -> "tuple[tuple[_TableCellSpan, ...], ...]":
+    def _table_cell_spans_on_page(self) -> tuple[tuple[_TableCellSpan, ...], ...]:
         """
         Order table cells on each page by their spans such that they can be bisected.
         """
@@ -105,7 +101,7 @@ class EtlOutput:
             for page_tables in self.tables_on_page
         )
 
-    def table_cells_for(self, span: "Span") -> "Iterator[tuple[Table, Cell]]":
+    def table_cells_for(self, span: Span) -> Iterator[tuple[Table, Cell]]:
         """
         Yield the table cells that overlap with `span`.
 

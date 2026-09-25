@@ -2,7 +2,7 @@ from copy import deepcopy
 from dataclasses import dataclass, replace
 from functools import partial
 from itertools import chain
-from typing import TYPE_CHECKING, Any
+from typing import Any, Self
 
 from . import predictions as prediction
 from .document import Document
@@ -13,43 +13,40 @@ from .review import Review, ReviewType
 from .task import Task
 from .utils import get
 
-if TYPE_CHECKING:
-    from typing_extensions import Self
-
 
 @dataclass(frozen=True, order=True)
 class Result:
     submission_id: int
-    documents: "tuple[Document, ...]"
-    tasks: "tuple[Task, ...]"
-    reviews: "tuple[Review, ...]"
-    predictions: "PredictionList[Prediction]"
+    documents: tuple[Document, ...]
+    tasks: tuple[Task, ...]
+    reviews: tuple[Review, ...]
+    predictions: PredictionList[Prediction]
 
     @property
     def rejected(self) -> bool:
         return len(self.reviews) > 0 and self.reviews[-1].rejected
 
     @property
-    def pre_review(self) -> "PredictionList[Prediction]":
+    def pre_review(self) -> PredictionList[Prediction]:
         return self.predictions.where(review=None)
 
     @property
-    def auto_review(self) -> "PredictionList[Prediction]":
+    def auto_review(self) -> PredictionList[Prediction]:
         return self.predictions.where(review=ReviewType.AUTO)
 
     @property
-    def manual_review(self) -> "PredictionList[Prediction]":
+    def manual_review(self) -> PredictionList[Prediction]:
         return self.predictions.where(review=ReviewType.MANUAL)
 
     @property
-    def admin_review(self) -> "PredictionList[Prediction]":
+    def admin_review(self) -> PredictionList[Prediction]:
         return self.predictions.where(review=ReviewType.ADMIN)
 
     @property
-    def final(self) -> "PredictionList[Prediction]":
+    def final(self) -> PredictionList[Prediction]:
         return self.predictions.where(review=self.reviews[-1] if self.reviews else None)
 
-    def __deepcopy__(self, memo: Any) -> "Self":
+    def __deepcopy__(self, memo: Any) -> Self:
         """
         Supports `copy.deepcopy(result)` without copying immutable objects.
         """
@@ -95,7 +92,7 @@ class Result:
         )
         reviews = sorted(map(Review.from_dict, review_metadata.values()))
 
-        predictions: "PredictionList[Prediction]" = PredictionList()
+        predictions: PredictionList[Prediction] = PredictionList()
 
         for document_dict in submission_results:
             document_id = get(document_dict, int, "submissionfile_id")
