@@ -1,3 +1,5 @@
 """Indico Toolkit for Intake and Insights"""
 
-__version__ = "7.2.3"
+import importlib.metadata
+
+__version__ = importlib.metadata.version(__package__)  # type: ignore[ty:invalid-argument-type]
