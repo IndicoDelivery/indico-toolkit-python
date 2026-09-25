@@ -3,10 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and versions match the minimum IPA version required to use functionality.
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
 ## [v7.2.3] - 2026-01-30
+
+Minimum Platform Version: `Intake v7.2`
 
 ### Added
 
@@ -29,6 +31,8 @@ and versions match the minimum IPA version required to use functionality.
 
 
 ## [v7.2.2] - 2025-10-14
+
+Minimum Platform Version: `Intake v7.2`
 
 ### Added
 
@@ -58,6 +62,8 @@ and versions match the minimum IPA version required to use functionality.
 
 ## [v7.2.1] - 2025-09-09
 
+Minimum Platform Version: `Intake v7.2`
+
 ### Fixed
 
 - Account for row spans and column spans in ETL output tables.
@@ -67,6 +73,8 @@ and versions match the minimum IPA version required to use functionality.
 
 
 ## [v7.2.0] - 2025-06-17
+
+Minimum Platform Version: `Intake v7.2`
 
 ### Added
 
@@ -91,6 +99,8 @@ and versions match the minimum IPA version required to use functionality.
 
 ## [v6.14.2] - 2025-05-08
 
+Minimum Platform Version: `Intake v6.14`
+
 ### Added
 
 - Support for imported models using IPA 7.2 `component_metadata` section.
@@ -108,6 +118,8 @@ and versions match the minimum IPA version required to use functionality.
 
 ## [v6.14.1] - 2025-03-20
 
+Minimum Platform Version: `Intake v6.14`
+
 ### Changed
 
 - Improve Poetry and Poe configuration.
@@ -115,6 +127,8 @@ and versions match the minimum IPA version required to use functionality.
 
 
 ## [v6.14.0] - 2025-03-10
+
+Minimum Platform Version: `Intake v6.14`
 
 ### Added
 
