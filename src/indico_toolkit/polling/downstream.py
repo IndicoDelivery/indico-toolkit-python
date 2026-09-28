@@ -1,14 +1,9 @@
 import asyncio
 import logging
 from collections.abc import Awaitable, Callable
-from typing import NoReturn, TypeAlias
+from typing import Any, NoReturn, TypeAlias
 
-from indico import AsyncIndicoClient, IndicoConfig
-from indico.queries import GetSubmission, UpdateSubmission
-from indico.types import Submission
-
-from .queries import SubmissionIdsPendingDownstream
-from .retry import retry
+from ..microclient import MicroClient
 
 SubmissionId: TypeAlias = int
 Worker: TypeAlias = asyncio.Task[None]
@@ -23,34 +18,25 @@ class DownstreamPoller:
     them concurrently, and marks them as retrieved.
     """
 
-    def __init__(  # type: ignore[no-any-unimported]
+    def __init__(
         self,
-        config: IndicoConfig,
+        host: str,
+        token: str,
         workflow_id: int,
-        downstream: Callable[[Submission], Awaitable[None]],
+        downstream: Callable[[Any], Awaitable[None]],
         *,
         worker_count: int = 8,
         spawn_rate: float = 1,
         poll_delay: float = 30,
-        retry_count: int = 4,
-        retry_wait: float = 1,
-        retry_backoff: float = 4,
-        retry_jitter: float = 0.5,
     ):
-        self._config = config
+        self._host = host
+        self._token = token
         self._workflow_id = workflow_id
         self._downstream = downstream
         self._worker_count = worker_count
         self._spawn_rate = spawn_rate
         self._poll_delay = poll_delay
 
-        self._retry = retry(
-            Exception,
-            count=retry_count,
-            wait=retry_wait,
-            backoff=retry_backoff,
-            jitter=retry_jitter,
-        )
         self._worker_slots = asyncio.Semaphore(worker_count)
         self._worker_queue: WorkerQueue = asyncio.Queue(1)
         self._processing_submission_ids: set[SubmissionId] = set()
@@ -58,13 +44,17 @@ class DownstreamPoller:
     async def poll_forever(self) -> NoReturn:  # type: ignore[misc]
         logger.info(
             "Starting downstream poller for: "
-            f"host={self._config.host} "
+            f"host={self._host} "
             f"workflow_id={self._workflow_id} "
             f"worker_count={self._worker_count}"
         )
 
-        async with AsyncIndicoClient(self._config) as client:
-            self._client_call = self._retry(client.call)
+        async with MicroClient(
+            host=self._host,
+            is_insights_host=False,
+            token=self._token,
+            is_bearer_token=False,
+        ) as self._client:
             await asyncio.gather(
                 self._spawn_workers(),
                 *(self._reap_workers() for _ in range(self._worker_count)),
@@ -85,9 +75,39 @@ class DownstreamPoller:
 
         while True:
             try:
-                submission_ids: set[SubmissionId] = await self._client_call(
-                    SubmissionIdsPendingDownstream(self._workflow_id)
+                response = await self._client.graphql(
+                    """
+                    query GetSubmissionIdsPendingDownstream($workflow_ids: [Int]) {
+                        submissions(
+                            desc: false
+                            filters: {
+                                AND: [
+                                    {
+                                        OR: [
+                                            { status: COMPLETE }
+                                            { status: FAILED }
+                                        ]
+                                    }
+                                    { filesDeleted: false }
+                                    { retrieved: false }
+                                ]
+                            }
+                            limit: 1000
+                            orderBy: ID
+                            workflowIds: $workflow_ids
+                        ) {
+                            submissions {
+                                id
+                            }
+                        }
+                    }
+                    """,
+                    {
+                        "workflow_ids": [self._workflow_id],
+                    },
                 )
+                submissions = response.submissions.submissions
+                submission_ids = set(submission.id for submission in submissions)
             except Exception:
                 logger.exception("Error occurred while polling submissions")
                 await asyncio.sleep(self._poll_delay)
@@ -113,13 +133,82 @@ class DownstreamPoller:
         `self._downstream`. Once completed, mark the submission retrieved.
         """
         logger.info(f"Retrieving metadata for {submission_id=}")
-        submission = await self._client_call(GetSubmission(submission_id))
+        submission = await self._client.graphql(
+            """
+            query GetSubmission($submission_id: Int!){
+                submission(id: $submission_id){
+                    submission_id: id
+                    dataset_id: datasetId
+                    workflow_id: workflowId
+                    status
+                    created_at: createdAt
+                    updated_at: updatedAt
+                    created_by: createdBy
+                    updated_by: updatedBy
+                    completed_at: completedAt
+                    errors
+                    files_deleted: filesDeleted
+                    input_files: inputFiles {
+                        id
+                        filename
+                        file_path: filepath
+                        file_type: filetype
+                        file_size: fileSize
+                        num_pages: numPages
+                    }
+                    input_file: inputFile
+                    input_filename: inputFilename
+                    result_file: resultFile
+                    output_files: outputFiles {
+                        id
+                        file_path: filepath
+                        component_id: componentId
+                        created_at: createdAt
+                    }
+                    retrieved: retrieved
+                    retries {
+                        id
+                        previous_errors: previousErrors
+                        previous_status: previousStatus
+                        retry_errors: retryErrors
+                    }
+                    reviews {
+                        id
+                        created_at: createdAt
+                        created_by: createdBy
+                        started_at: startedAt
+                        completed_at: completedAt
+                        rejected: rejected
+                        review_type: reviewType
+                        notes
+                    }
+                    review_in_progress: reviewInProgress
+                }
+            }
+            """,
+            {
+                "submission_id": submission_id,
+            },
+        )
 
         logger.info(f"Sending {submission_id=} downstream")
         await self._downstream(submission)
 
         logger.info(f"Marking {submission_id=} retrieved")
-        await self._client_call(UpdateSubmission(submission_id, retrieved=True))
+        await self._client.graphql(
+            """
+            mutation UpdateSubmission($submission_id: Int!, $retrieved: Boolean) {
+                updateSubmission(submissionId: $submission_id, retrieved: $retrieved) {
+                    submission_id: id
+                    retrieved
+                }
+            }
+            """,
+            {
+                "submission_id": submission_id,
+                "retrieved": True,
+            },
+        )
 
         logger.info(f"Completed dowstream of {submission_id=}")
 

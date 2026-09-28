@@ -1,17 +1,14 @@
 import asyncio
+import json
 import logging
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any, NoReturn, TypeAlias
 
-from indico import AsyncIndicoClient, IndicoConfig
-from indico.queries import GetSubmission, JobStatus, RetrieveStorageObject, SubmitReview
-
 from .. import etloutput, results
 from ..etloutput import EtlOutput
+from ..microclient import MicroClient
 from ..results import Document, Result
-from .queries import SubmissionIdsPendingAutoReview
-from .retry import retry
 
 SubmissionId: TypeAlias = int
 Worker: TypeAlias = asyncio.Task[None]
@@ -33,9 +30,10 @@ class AutoReviewPoller:
     and submits the review results concurrently.
     """
 
-    def __init__(  # type: ignore[no-any-unimported]
+    def __init__(
         self,
-        config: IndicoConfig,
+        host: str,
+        token: str,
         workflow_id: int,
         auto_review: Callable[
             [Result, dict[Document, EtlOutput]],
@@ -49,12 +47,9 @@ class AutoReviewPoller:
         load_text: bool = True,
         load_tokens: bool = True,
         load_tables: bool = True,
-        retry_count: int = 4,
-        retry_wait: float = 1,
-        retry_backoff: float = 4,
-        retry_jitter: float = 0.5,
     ):
-        self._config = config
+        self._host = host
+        self._token = token
         self._workflow_id = workflow_id
         self._auto_review = auto_review
         self._worker_count = worker_count
@@ -65,13 +60,6 @@ class AutoReviewPoller:
         self._load_tokens = load_tokens
         self._load_tables = load_tables
 
-        self._retry = retry(
-            Exception,
-            count=retry_count,
-            wait=retry_wait,
-            backoff=retry_backoff,
-            jitter=retry_jitter,
-        )
         self._worker_slots = asyncio.Semaphore(worker_count)
         self._worker_queue: WorkerQueue = asyncio.Queue(1)
         self._processing_submission_ids: set[SubmissionId] = set()
@@ -79,22 +67,23 @@ class AutoReviewPoller:
     async def poll_forever(self) -> NoReturn:  # type: ignore[misc]
         logger.info(
             "Starting auto review poller for: "
-            f"host={self._config.host} "
+            f"host={self._host} "
             f"workflow_id={self._workflow_id} "
             f"worker_count={self._worker_count}"
         )
 
-        async with AsyncIndicoClient(self._config) as client:
-            self._client_call = self._retry(client.call)
+        async with MicroClient(
+            host=self._host,
+            is_insights_host=False,
+            token=self._token,
+            is_bearer_token=False,
+        ) as self._client:
             await asyncio.gather(
                 self._spawn_workers(),
                 *(self._reap_workers() for _ in range(self._worker_count)),
             )
 
         assert False, "NoReturn"
-
-    async def _retrieve_storage_object(self, uri: str) -> Any:
-        return await self._client_call(RetrieveStorageObject(uri))
 
     async def _spawn_workers(self) -> None:
         """
@@ -108,9 +97,34 @@ class AutoReviewPoller:
 
         while True:
             try:
-                submission_ids: set[SubmissionId] = await self._client_call(
-                    SubmissionIdsPendingAutoReview(self._workflow_id)
+                response = await self._client.graphql(
+                    """
+                    query GetSubmissionIdsPendingAutoReview($workflow_ids: [Int]) {
+                        submissions(
+                            desc: false
+                            filters: {
+                                AND: [
+                                    { status: PENDING_AUTO_REVIEW }
+                                    { filesDeleted: false }
+                                    { retrieved: false }
+                                ]
+                            }
+                            limit: 1000
+                            orderBy: ID
+                            workflowIds: $workflow_ids
+                        ) {
+                            submissions {
+                                id
+                            }
+                        }
+                    }
+                    """,
+                    {
+                        "workflow_ids": [self._workflow_id],
+                    },
                 )
+                submissions = response.submissions.submissions
+                submission_ids = set(submission.id for submission in submissions)
             except Exception:
                 logger.exception("Error occurred while polling submissions")
                 await asyncio.sleep(self._poll_delay)
@@ -136,12 +150,25 @@ class AutoReviewPoller:
         etl output, calling `self._auto_review`, and submitting changes.
         """
         logger.info(f"Retrieving metadata for {submission_id=}")
-        submission = await self._client_call(GetSubmission(submission_id))
+        response = await self._client.graphql(
+            """
+            query GetSubmission($submission_id: Int!) {
+                submission(id: $submission_id) {
+                    result_file: resultFile
+                    status
+                }
+            }
+            """,
+            {
+                "submission_id": submission_id,
+            },
+        )
+        submission = response.submission
 
         logger.info(f"Retrieving results for {submission_id=}")
         result = await results.load_async(
             submission.result_file,
-            reader=self._retrieve_storage_object,
+            reader=self._client.storage,
         )
 
         if self._load_etl_output:
@@ -149,7 +176,7 @@ class AutoReviewPoller:
             etl_outputs = {
                 document: await etloutput.load_async(
                     document.etl_output_uri,
-                    reader=self._retrieve_storage_object,
+                    reader=self._client.storage,
                     text=self._load_text,
                     tokens=self._load_tokens,
                     tables=self._load_tables,
@@ -165,15 +192,54 @@ class AutoReviewPoller:
         auto_reviewed = await self._auto_review(result, etl_outputs)
 
         logger.info(f"Submitting auto review for {submission_id=}")
-        job = await self._client_call(
-            SubmitReview(
-                submission_id,
-                changes=auto_reviewed.changes,
-                rejected=auto_reviewed.reject,
-                force_complete=auto_reviewed.stp,
-            )
+        response = await self._client.graphql(
+            """
+            mutation SubmitAutoReview(
+                $submission_id: Int!
+                $changes: JSONString!
+                $straight_through_process: Boolean!
+                $reject: Boolean!
+            ) {
+                submitAutoReview(
+                    submissionId: $submission_id
+                    changes: $changes
+                    forceComplete: $straight_through_process
+                    rejected: $reject
+                ) {
+                    id: jobId
+                }
+            }
+            """,
+            {
+                "submission_id": submission_id,
+                "changes": (
+                    json.dumps(auto_reviewed.changes)
+                    if auto_reviewed.changes is not None
+                    else None
+                ),
+                "straight_through_process": auto_reviewed.stp,
+                "reject": auto_reviewed.reject,
+            },
         )
-        job = await self._client_call(JobStatus(job.id))
+        job = response.submitAutoReview
+        job.status = "PENDING"
+
+        while job.status in ("PENDING", "RECEIVED", "STARTED"):
+            response = await self._client.graphql(
+                """
+                query GetJob($job_id: String!) {
+                    job(id: $job_id) {
+                        id
+                        status
+                        result
+                    }
+                }
+                """,
+                {
+                    "job_id": job.id,
+                },
+            )
+            job = response.job
 
         if job.status == "SUCCESS":
             logger.info(f"Completed auto review of {submission_id=}")
