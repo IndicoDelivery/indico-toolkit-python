@@ -225,6 +225,7 @@ class AutoReviewPoller:
         job.status = "PENDING"
 
         while job.status in ("PENDING", "RECEIVED", "STARTED"):
+            await asyncio.sleep(2)
             response = await self._client.graphql(
                 """
                 query GetJob($job_id: String!) {
