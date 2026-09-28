@@ -5,21 +5,36 @@ Overview of dataclasses and functionality available in the results module.
 from operator import attrgetter
 from pathlib import Path
 
-from indico import IndicoClient
-from indico.queries import GetSubmission, RetrieveStorageObject
-
 from indico_toolkit import results
+from indico_toolkit.microclient import MicroClient
 
 """
 Loading Result Files
 """
 
 # Result files can be loaded as Python-native dataclasses from result dictionaries
-# returned by the Indico client, from JSON strings, and from JSON files on disk.
-client = IndicoClient()
-submission = client.call(GetSubmission(123))
-result_dict = client.call(RetrieveStorageObject(submission.result_file))
-result = results.load(result_dict)
+# returned by the GraphQL API, from JSON strings, and from JSON files on disk.
+async def load_via_graphql(submission_id: int) -> results.Result:
+    async with MicroClient(
+        host="try.indico.io",
+        token=Path("indico_api_token.txt").read_text(),
+    ) as client:
+        response = await client.graphql(
+            """
+            query GetSubmission($submission_id: Int!) {
+                submission(id: $submission_id) {
+                    result_file: resultFile
+                }
+            }
+            """,
+            {
+                "submission_id": submission_id,
+            },
+        )
+        submission = response.submission
+        result_json = await client.storage(submission.result_file)
+        return results.load(result_json)
+
 
 result = results.load("""{"file_version": 1, ... }""")
 
