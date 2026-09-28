@@ -137,7 +137,7 @@ class DownstreamPoller:
             """
             query GetSubmission($submission_id: Int!){
                 submission(id: $submission_id){
-                    submission_id: id
+                    id
                     dataset_id: datasetId
                     workflow_id: workflowId
                     status
@@ -151,8 +151,8 @@ class DownstreamPoller:
                     input_files: inputFiles {
                         id
                         filename
-                        file_path: filepath
-                        file_type: filetype
+                        filepath
+                        filetype
                         file_size: fileSize
                         num_pages: numPages
                     }
@@ -161,11 +161,21 @@ class DownstreamPoller:
                     result_file: resultFile
                     output_files: outputFiles {
                         id
-                        file_path: filepath
+                        filepath
                         component_id: componentId
                         created_at: createdAt
                     }
-                    retrieved: retrieved
+                    retrieved
+                    auto_review: autoReview {
+                        id
+                        created_at: createdAt
+                        created_by: createdBy
+                        started_at: startedAt
+                        completed_at: completedAt
+                        rejected
+                        review_type: reviewType
+                        notes
+                    }
                     retries {
                         id
                         previous_errors: previousErrors
@@ -178,7 +188,7 @@ class DownstreamPoller:
                         created_by: createdBy
                         started_at: startedAt
                         completed_at: completedAt
-                        rejected: rejected
+                        rejected
                         review_type: reviewType
                         notes
                     }
