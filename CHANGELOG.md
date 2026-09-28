@@ -8,7 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v10.0.0] - 2026-10-01
 
-Minimum Platform Version: `Intake v7.2`
+Minimum Platform Version: `Intake v7.2`, `Insights v2.5`
+
+### Added
+
+- Added `orm`, `microclient`, and `router` modules for Insights.
+- Added `asyncstdlib`, `httpx`, and `tenacity` as package dependencies.
 
 ### Changed
 
@@ -20,6 +25,7 @@ Minimum Platform Version: `Intake v7.2`
     - Corrected some type annotations and object types.
 - Updated GitHub Actions workflow.
 - Made `indico_toolkit.__version__` use pyproject.toml project metadata.
+- Replaced `indico-client` with `microclient` for `polling` API calls.
 
 ### Fixed
 
