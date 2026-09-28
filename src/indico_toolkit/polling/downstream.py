@@ -133,7 +133,7 @@ class DownstreamPoller:
         `self._downstream`. Once completed, mark the submission retrieved.
         """
         logger.info(f"Retrieving metadata for {submission_id=}")
-        submission = await self._client.graphql(
+        response = await self._client.graphql(
             """
             query GetSubmission($submission_id: Int!){
                 submission(id: $submission_id){
@@ -200,6 +200,7 @@ class DownstreamPoller:
                 "submission_id": submission_id,
             },
         )
+        submission = response.submission
 
         logger.info(f"Sending {submission_id=} downstream")
         await self._downstream(submission)
