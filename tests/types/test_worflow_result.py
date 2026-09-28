@@ -24,7 +24,7 @@ def test_no_final_preds():
         },
         "model_v1",
     )
-    assert wf_result.final_predictions._preds == []
+    assert wf_result.final_predictions._preds == []  # type: ignore[ty:unresolved-attribute]
 
 
 def test_predictions_no_pre_review():
