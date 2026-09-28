@@ -197,8 +197,14 @@ class DownstreamPoller:
         logger.info(f"Marking {submission_id=} retrieved")
         await self._client.graphql(
             """
-            mutation UpdateSubmission($submission_id: Int!, $retrieved: Boolean) {
-                updateSubmission(submissionId: $submission_id, retrieved: $retrieved) {
+            mutation UpdateSubmission(
+                $submission_id: Int!
+                $retrieved: Boolean
+            ) {
+                updateSubmission(
+                    submissionId: $submission_id
+                    retrieved: $retrieved
+                ) {
                     submission_id: id
                     retrieved
                 }

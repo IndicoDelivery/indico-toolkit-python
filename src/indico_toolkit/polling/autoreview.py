@@ -196,9 +196,9 @@ class AutoReviewPoller:
             """
             mutation SubmitAutoReview(
                 $submission_id: Int!
-                $changes: JSONString!
-                $straight_through_process: Boolean!
-                $reject: Boolean!
+                $changes: JSONString
+                $straight_through_process: Boolean
+                $reject: Boolean
             ) {
                 submitAutoReview(
                     submissionId: $submission_id
