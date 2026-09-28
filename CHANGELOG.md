@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [v10.0.0] - 2026-10-01
+
+Minimum Platform Version: `Intake v7.2`
+
+### Changed
+
+- Migrated from `poetry` to `uv` for package management.
+    - Moved source code into `src/` directory.
+- Migrated from `black` to `ruff` for code formatting.
+    - Reformatted codebase.
+- Migrated from `mypy` to `ty` for static type checking.
+    - Corrected some type annotations and object types.
+- Updated GitHub Actions workflow.
+- Made `indico_toolkit.__version__` use pyproject.toml project metadata.
+
+### Fixed
+
+- Fixed some unit test assertions.
+
+### Removed
+
+- Removed `auto_review`, `errors`, `indico_wrapper`, `metrics`, `ocr`, `pipelines`, `snapshots`, and `structure` modules.
+- Removed associated units tests.
+- Removed `indico-client` dependency.
+- Support for EOL Python 3.10.
+- Removed Python <=3.10 type hint quoting.
+
+
 ## [v7.2.3] - 2026-01-30
 
 Minimum Platform Version: `Intake v7.2`
@@ -329,6 +357,7 @@ This is the first major version release tested to work on Indico 6.X.
 - Row Association now also sorting on 'bbtop'.
 
 
+[v10.0.0]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v7.2.3...v10.0.0
 [v7.2.3]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v7.2.2...v7.2.3
 [v7.2.2]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v7.2.1...v7.2.2
 [v7.2.1]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v7.2.0...v7.2.1
