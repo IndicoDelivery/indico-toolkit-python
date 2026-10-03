@@ -7,15 +7,16 @@ from typing import Any
 
 from .collections import WeakIdKeyDictionary
 from .fields import get_fields, validate_fields
-from .types import GraphqlIterator, SubmissionType
+from .types import Categorical, GraphqlIterator, SubmissionType
 
 _SUPPORTED_COLLECTION_TYPES = (
     list,
     set,
     None,
 )
-_SUPPORTED_SCALAR_TYPES = (
+_SUPPORTED_SCALAR_TYPES: tuple[type, ...] = (  # type: ignore[ty:invalid-assignment]
     bool,
+    Categorical,
     date,
     datetime,
     float,
@@ -257,6 +258,8 @@ def _structured(scalar_type: type[Any], value: Any) -> dict[str, dict[str, Any]]
     """
     if scalar_type is bool:
         return {"boolean": {"value": value}}
+    elif scalar_type is Categorical:
+        return {"lookup": {"option": value}}
     elif scalar_type is date:
         return {"date": {"year": value.year, "month": value.month, "day": value.day}}
     elif scalar_type is datetime:

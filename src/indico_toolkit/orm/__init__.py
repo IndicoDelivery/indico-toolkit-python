@@ -5,9 +5,10 @@ from typing import Any
 from . import submissions, tables
 from .submissions import Submission
 from .tables import Table
-from .types import GraphqlIterator, OrmType
+from .types import Categorical, GraphqlIterator, OrmType
 
 __all__ = (
+    "Categorical",
     "init",
     "load",
     "save",

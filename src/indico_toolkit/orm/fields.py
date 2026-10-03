@@ -4,7 +4,9 @@ from collections.abc import Callable, Collection
 from datetime import date, datetime
 from functools import cache
 from types import NoneType, UnionType
-from typing import Any
+from typing import Any, Union
+
+from .types import Categorical
 
 
 @dataclasses.dataclass(frozen=True)
@@ -50,7 +52,7 @@ def _get_field(field: dataclasses.Field[Any]) -> Field:
 
     if collection_type is None:
         raise TypeError(f"{attribute} must be an optional type or a collection type")
-    elif collection_type is UnionType:
+    elif collection_type in (Union, UnionType):
         if len(args) != 2 or NoneType not in args:
             raise TypeError(f"{attribute} must be a single optional type")
     else:
@@ -59,7 +61,7 @@ def _get_field(field: dataclasses.Field[Any]) -> Field:
 
     scalar_type = next(arg for arg in args if arg is not NoneType)
     scalar_parser = SCALAR_PARSER_SERIALZER_BY_TYPE.get(scalar_type)
-    multi = collection_type is not UnionType
+    multi = collection_type not in (Union, UnionType)
 
     return Field(
         id=field.name,
@@ -73,6 +75,7 @@ def _get_field(field: dataclasses.Field[Any]) -> Field:
 
 SCALAR_PARSER_SERIALZER_BY_TYPE: dict[type, Callable[[type], object]] = {  # type: ignore[ty:invalid-assignment]
     bool: bool,
+    Categorical: Categorical,
     date: date.fromisoformat,
     datetime: datetime.fromisoformat,
     float: float,
