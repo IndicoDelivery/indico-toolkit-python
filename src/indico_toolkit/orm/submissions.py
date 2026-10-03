@@ -2,6 +2,7 @@ import dataclasses
 import textwrap
 import typing
 from collections.abc import Iterable, Iterator
+from datetime import date, datetime
 from typing import Any
 
 from .collections import WeakIdKeyDictionary
@@ -15,6 +16,8 @@ _SUPPORTED_COLLECTION_TYPES = (
 )
 _SUPPORTED_SCALAR_TYPES = (
     bool,
+    date,
+    datetime,
     float,
     int,
     str,
@@ -99,13 +102,13 @@ def init(submission_class: type[SubmissionType], graphql: Iterable[Any]) -> Iter
                 prev_ids[field.id] = None
             else:
                 kwargs[field.id] = field.collection_type(
-                    field.scalar_type(value.value) for value in values
+                    field.scalar_parser(value.value) for value in values
                 )
                 prev_values[field.id] = field.collection_type(
-                    field.scalar_type(value.value) for value in values
+                    field.scalar_parser(value.value) for value in values
                 )
                 prev_ids[field.id] = {
-                    field.scalar_type(value.value): value.id for value in values
+                    field.scalar_parser(value.value): value.id for value in values
                 }
         else:
             if not values:
@@ -113,8 +116,8 @@ def init(submission_class: type[SubmissionType], graphql: Iterable[Any]) -> Iter
                 prev_values[field.id] = None
                 prev_ids[field.id] = None
             else:
-                kwargs[field.id] = field.scalar_type(values[0].value)
-                prev_values[field.id] = field.scalar_type(values[0].value)
+                kwargs[field.id] = field.scalar_parser(values[0].value)
+                prev_values[field.id] = field.scalar_parser(values[0].value)
                 prev_ids[field.id] = values[0].id
 
     instance = submission_class(**kwargs)
@@ -254,6 +257,16 @@ def _structured(scalar_type: type[Any], value: Any) -> dict[str, dict[str, Any]]
     """
     if scalar_type is bool:
         return {"boolean": {"value": value}}
+    elif scalar_type is date:
+        return {"date": {"year": value.year, "month": value.month, "day": value.day}}
+    elif scalar_type is datetime:
+        return {
+            "dateTime": {
+                "year": value.year, "month": value.month, "day": value.day,
+                "hour": value.hour, "minute": value.minute, "second": value.second,
+                "microsecond": value.microsecond,
+            }
+        }  # fmt: skip
     elif scalar_type is int or scalar_type is float:
         return {"number": {"numberPrecise": str(value)}}
     elif scalar_type is str:

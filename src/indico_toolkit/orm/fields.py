@@ -1,6 +1,7 @@
 import dataclasses
 import typing
-from collections.abc import Collection
+from collections.abc import Callable, Collection
+from datetime import date, datetime
 from functools import cache
 from types import NoneType, UnionType
 from typing import Any
@@ -11,6 +12,7 @@ class Field:
     id: str
     multi: bool
     scalar_type: type
+    scalar_parser: Any
     collection_type: type | None
     attribute: str
 
@@ -56,12 +58,24 @@ def _get_field(field: dataclasses.Field[Any]) -> Field:
             raise TypeError(f"{attribute} must be a single collection type")
 
     scalar_type = next(arg for arg in args if arg is not NoneType)
+    scalar_parser = SCALAR_PARSER_SERIALZER_BY_TYPE.get(scalar_type)
     multi = collection_type is not UnionType
 
     return Field(
         id=field.name,
         multi=multi,
         scalar_type=scalar_type,
+        scalar_parser=scalar_parser,
         collection_type=collection_type if multi else None,
         attribute=attribute,
     )
+
+
+SCALAR_PARSER_SERIALZER_BY_TYPE: dict[type, Callable[[type], object]] = {  # type: ignore[ty:invalid-assignment]
+    bool: bool,
+    date: date.fromisoformat,
+    datetime: datetime.fromisoformat,
+    float: float,
+    int: int,
+    str: str,
+}
