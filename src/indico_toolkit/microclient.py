@@ -69,6 +69,26 @@ def make_namespace(json_object_dict: dict[str, Any]) -> SimpleNamespace:
     return SimpleNamespace(**json_object_dict)
 
 
+def raise_for_errors(response_json: Any, as_namespaces: bool) -> None:
+    """
+    Check for and raise GraphQL errors in query responses.
+    """
+    errors = (
+        getattr(response_json, "errors", None)
+        if as_namespaces else
+        response_json.get("errors", None)
+    )  # fmt: skip
+
+    if errors:
+        raise RuntimeError(
+            "GraphQL Errors: "
+            + "; ".join(
+                error.message if as_namespaces else error["message"]
+                for error in errors
+            )
+        )  # fmt: skip
+
+
 class MicroClientAuth(httpx.Auth):
     def __init__(self, refresh_url: str, refresh_token: str):
         self._refresh_url = refresh_url
@@ -218,22 +238,8 @@ class MicroClient:
         response.raise_for_status()
         response_json = response.json(
             object_hook=make_namespace if as_namespaces else None
-        )
-        errors = (
-            getattr(response_json, "errors", None)
-            if as_namespaces
-            else response_json.get("errors", None)
-        )
-
-        if errors:
-            raise RuntimeError(
-                "GraphQL Errors: "
-                + "; ".join(
-                    error.message if as_namespaces else error["message"]
-                    for error in errors
-                )
-            )
-
+        )  # fmt: skip  # noqa: E501
+        raise_for_errors(response_json, as_namespaces)
         return response_json.data if as_namespaces else response_json["data"]
 
     async def subscription(
@@ -257,27 +263,13 @@ class MicroClient:
                 if line.startswith("{") and not line.startswith("{}"):
                     response_json = json.loads(
                         line, object_hook=make_namespace if as_namespaces else None
-                    )
+                    )  # fmt: skip  # noqa: E501
                     payload = (
                         response_json.payload
                         if as_namespaces
                         else response_json["payload"]
-                    )
-                    errors = (
-                        getattr(payload, "errors", None)
-                        if as_namespaces
-                        else payload.get("errors", None)
-                    )
-
-                    if errors:
-                        raise RuntimeError(
-                            "GraphQL Errors: "
-                            + "; ".join(
-                                error.message if as_namespaces else error["message"]
-                                for error in errors
-                            )
-                        )
-
+                    )  # fmt: skip  # noqa: E501
+                    raise_for_errors(payload, as_namespaces)
                     yield payload.data if as_namespaces else payload["data"]
 
     async def rest(
