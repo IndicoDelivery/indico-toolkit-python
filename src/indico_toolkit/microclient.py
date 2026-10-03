@@ -12,7 +12,14 @@ async with MicroClient(host, token) as client:
     json = await client.graphql(query, variables, files)
     json = await client.rest(method, path, query, body, files)
     bytes = await client.storage(uri)
+
+    async for message in client.subscription(query, variables):
+        ...
 ```
+
+The `graphql()`, `subscription()`, and `rest()` methods return namespaces by default,
+supporting Pythonic attribute usage. Use the `as_dicts` flag to return dicts instead.
+E.g. `client.graphql(..., as_dicts=True)`
 """
 
 import asyncio
@@ -183,7 +190,11 @@ class MicroClient:
         query: str,
         variables: Mapping[str, Any] | None = None,
         files: Mapping[str, tuple[str, bytes | IO[bytes]]] | None = None,
+        *,
+        as_dicts: bool = False,
     ) -> Any:
+        as_namespaces = not as_dicts
+
         if not files:
             response = await self.request(
                 method="POST",
@@ -205,21 +216,35 @@ class MicroClient:
             )
 
         response.raise_for_status()
-        response_json = response.json(object_hook=make_namespace)
+        response_json = response.json(
+            object_hook=make_namespace if as_namespaces else None
+        )
+        errors = (
+            getattr(response_json, "errors", None)
+            if as_namespaces
+            else response_json.get("errors", None)
+        )
 
-        if hasattr(response_json, "errors"):
+        if errors:
             raise RuntimeError(
                 "GraphQL Errors: "
-                + "; ".join(error.message for error in response_json.errors)
+                + "; ".join(
+                    error.message if as_namespaces else error["message"]
+                    for error in errors
+                )
             )
 
-        return response_json.data
+        return response_json.data if as_namespaces else response_json["data"]
 
     async def subscription(
         self,
         query: str,
         variables: Mapping[str, Any] | None = None,
+        *,
+        as_dicts: bool = False,
     ) -> Any:
+        as_namespaces = not as_dicts
+
         async with self.stream(
             method="POST",
             url="/graphql",
@@ -230,15 +255,30 @@ class MicroClient:
         ) as response:
             async for line in response.aiter_lines():
                 if line.startswith("{") and not line.startswith("{}"):
-                    response_json = json.loads(line, object_hook=make_namespace).payload
+                    response_json = json.loads(
+                        line, object_hook=make_namespace if as_namespaces else None
+                    )
+                    payload = (
+                        response_json.payload
+                        if as_namespaces
+                        else response_json["payload"]
+                    )
+                    errors = (
+                        getattr(payload, "errors", None)
+                        if as_namespaces
+                        else payload.get("errors", None)
+                    )
 
-                    if hasattr(response_json, "errors"):
+                    if errors:
                         raise RuntimeError(
                             "GraphQL Errors: "
-                            + "; ".join(error.message for error in response_json.errors)
+                            + "; ".join(
+                                error.message if as_namespaces else error["message"]
+                                for error in errors
+                            )
                         )
 
-                    yield response_json.data
+                    yield payload.data if as_namespaces else payload["data"]
 
     async def rest(
         self,
@@ -248,7 +288,9 @@ class MicroClient:
         query: Mapping[str, Any] | None = None,
         body: Mapping[str, Any] | None = None,
         files: Iterable[tuple[str, bytes | IO[bytes]]] | None = None,
+        as_dicts: bool = False,
     ) -> Any:
+        as_namespaces = not as_dicts
         path = path.lstrip("/")
         response = await self.request(
             method=method,
@@ -258,7 +300,7 @@ class MicroClient:
             files=[("files", file) for file in files] if files else None,
         )
         response.raise_for_status()
-        return response.json(object_hook=make_namespace)
+        return response.json(object_hook=make_namespace if as_namespaces else None)
 
     async def storage(self, uri: str) -> bytes:
         if match := re.search(r"(?:^|/)(?:storage|blob|data)/+(.+)", uri):
