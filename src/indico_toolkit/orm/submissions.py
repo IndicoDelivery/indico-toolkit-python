@@ -61,7 +61,7 @@ def load(submission_class: type[Submission], submission_id: int) -> GraphqlItera
                                 {
                                     field: "status"
                                     op: EQUAL
-                                    textValues: "ACCEPTED"
+                                    textValues: ["ACCEPTED", "BUILTIN"]
                                 }
                             ]
                         ) {
