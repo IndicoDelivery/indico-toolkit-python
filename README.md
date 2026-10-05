@@ -1,53 +1,48 @@
-# Indico Toolkit
+# Indico Toolkit for Intake and Insights
 
 **This repository contains software that is not officially supported by Indico. It may
   be outdated or contain bugs. The operations it performs are potentially destructive.
   Use at your own risk.**
 
-Classes, functions, and abstractions for building workflows using the Indico IPA
-(Intelligent Process Automation) platform.
+Classes, functions, and abstractions for building workflows and workspaces using the Indico platform.
 
-- [Polling Classes](https://github.com/IndicoDataSolutions/indico-toolkit-python/tree/main/indico_toolkit/polling/__init__.py)
-  that implement best-practices polling behavior for Auto Review and Downstream
-  processes. Easily plug in business logic without the boilerplate.
-- [Result File](https://github.com/IndicoDataSolutions/indico-toolkit-python/blob/main/indico_toolkit/results/__init__.py)
-  and [Etl Output](https://github.com/IndicoDataSolutions/indico-toolkit-python/blob/main/indico_toolkit/etloutput/__init__.py)
-  Data Classes that parse standard IPA JSON output into idiomatic, type-safe Python dataclasses.
-- [Metrics Classes](https://github.com/IndicoDataSolutions/indico-toolkit-python/blob/main/indico_toolkit/metrics/__init__.py)
-  to compare model performance, evaluate ground truth, and plot statistics.
-- [Snapshot Classes](https://github.com/IndicoDataSolutions/indico-toolkit-python/blob/main/indico_toolkit/snapshots/snapshot.py)
-  to concatenate, merge, filter, and manipulate snapshot CSVs.
+- [MicroClient](https://github.com/IndicoDelivery/indico-toolkit-python/blob/main/src/indico_toolkit/microclient.py)
+  class that provides async methods for making GraphQL, REST, and Storage calls.
+  Includes authentication and best-practices retry. Can be used as a single-file drop-in
+  module with few dependencies for other projects.
+- [ORM](https://github.com/IndicoDelivery/indico-toolkit-python/blob/main/src/indico_toolkit/orm/__init__.py)
+  and [Router](https://github.com/IndicoDelivery/indico-toolkit-python/blob/main/src/indico_toolkit/router/__init__.py)
+  classes for writing Insights custom agents using declarative Data Classes and
+  automatic load and save of instance attributes.
+- [Polling](https://github.com/IndicoDelivery/indico-toolkit-python/blob/main/src/indico_toolkit/polling/__init__.py)
+  classes that implement best-practices polling behavior for Intake Auto Review and
+  Downstream processes. Easily plug in business logic without the boilerplate.
+- [Result File](https://github.com/IndicoDelivery/indico-toolkit-python/blob/main/src/indico_toolkit/results/__init__.py)
+  and [Etl Output](https://github.com/IndicoDelivery/indico-toolkit-python/blob/main/src/indico_toolkit/etloutput/__init__.py)
+  Data Classes that parse standard Intake JSON output into idiomatic, type-safe Python
+  dataclasses.
 
-...and more in the [Examples](https://github.com/IndicoDataSolutions/indico-toolkit-python/tree/main/examples) folder.
+...and more in the [Examples](https://github.com/IndicoDelivery/indico-toolkit-python/tree/main/examples) folder.
 
 
 ## Installation
 
-**Indico Toolkit does not use semantic versioning.**
+**Indico Toolkit uses semantic versioning.**
 
-Indico Toolkit versions match the minimum IPA version required to use its functionality.
-E.g. `indico-toolkit==6.14.0` makes use of functionality introduced in IPA 6.14, and
-some functionality requires IPA 6.14 or later to use.
+Indico Toolkit versions do not match the Intake or Insights versions they are compatible with.
+See the [Changelog](https://github.com/IndicoDelivery/indico-toolkit-python/blob/main/CHANGELOG.md)
+for the minimum platform version required by each toolkit version.
 
 ```bash
 pip install indico-toolkit
-```
-
-Some functionality requires optional dependencies that can be installed with extras.
-
-```bash
-pip install 'indico-toolkit[all]'
-pip install 'indico-toolkit[downloads]'
-pip install 'indico-toolkit[examples]'
-pip install 'indico-toolkit[metrics]'
-pip install 'indico-toolkit[predictions]'
-pip install 'indico-toolkit[snapshots]'
+poetry add indico-toolkit
+uv add indico-toolkit
 ```
 
 
 ## Contributing
 
-Indico Toolkit uses Poetry 2.X for package and dependency management.
+Indico Toolkit uses UV for package and dependency management.
 
 
 ### Setup
@@ -55,55 +50,20 @@ Indico Toolkit uses Poetry 2.X for package and dependency management.
 Clone the source repository with Git.
 
 ```bash
-git clone git@github.com:IndicoDataSolutions/indico-toolkit-python.git
+git clone git@github.com:IndicoDelivery/indico-toolkit-python.git
 ```
 
-Install dependencies with Poetry.
+Install dependencies with UV.
 
 ```bash
-poetry install
+uv sync
 ```
 
 Formatting, linting, type checking, and tests are defined as
 [Poe](https://poethepoet.natn.io/) tasks in `pyproject.toml`.
 
 ```bash
-poetry poe {format,check,test,all}
+uv run poe {format,check,test,all}
 ```
 
-Code changes or additions should pass `poetry poe all` before opening a PR.
-
-
-### Tests
-
-Indico Toolkit has three test suites: required unit tests, extra unit tests, and
-integration tests.
-
-By default, only required unit tests are executed. Extra unit tests and integration
-tests are skipped.
-
-```bash
-poetry poe {test,all}
-```
-
-Extra unit tests are skipped when their dependencies are not installed. To execute extra
-unit tests, install one or more extras and run the tests.
-
-```bash
-poetry install --all-extras
-poetry poe {test,all}
-```
-
-Integration tests make API calls to an IPA environment and require a host and API token
-to execute. These tests create datasets, setup workflows, and train models. **Expect
-them to take tens of minutes to run.**
-
-```bash
-poetry poe test-integration \
-    --host try.indico.io \
-    --token indico_api_token.txt
-```
-
-Make liberal use of pytest's `--last-failed` and `--failed-first`
-[flags](https://docs.pytest.org/en/stable/how-to/cache.html) to speed up integration
-test execution when writing code.
+Code changes or additions should pass `uv run poe all` before opening a PR.

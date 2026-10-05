@@ -1,6 +1,5 @@
 import pytest
 
-from indico_toolkit import ToolkitInputError
 from indico_toolkit.types import Extractions, WorkflowResult
 from indico_toolkit.types.classification import Classification
 
@@ -13,7 +12,7 @@ def test_get_predictions_set_model_name(wf_result_obj: WorkflowResult):
 
 def test_bad_model_name(wf_result_obj):
     wf_result_obj.model_name = "invalid model name"
-    with pytest.raises(ToolkitInputError):
+    with pytest.raises(KeyError):
         wf_result_obj.get_predictions()
 
 
@@ -25,7 +24,7 @@ def test_no_final_preds():
         },
         "model_v1",
     )
-    assert wf_result.final_predictions._preds == []
+    assert wf_result.final_predictions._preds == []  # type: ignore[ty:unresolved-attribute]
 
 
 def test_predictions_no_pre_review():

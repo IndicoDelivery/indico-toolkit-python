@@ -19,8 +19,8 @@ from indico_toolkit.results import (
 @pytest.fixture
 def document_extraction() -> DocumentExtraction:
     return DocumentExtraction.from_dict(
-        None,  # type: ignore[arg-type]
-        None,  # type: ignore[arg-type]
+        None,  # type: ignore[ty:invalid-argument-type]
+        None,  # type: ignore[ty:invalid-argument-type]
         None,
         {
             "label": "Agency",
@@ -40,8 +40,8 @@ def document_extraction() -> DocumentExtraction:
 @pytest.fixture
 def form_extraction() -> FormExtraction:
     return FormExtraction.from_dict(
-        None,  # type: ignore[arg-type]
-        None,  # type: ignore[arg-type]
+        None,  # type: ignore[ty:invalid-argument-type]
+        None,  # type: ignore[ty:invalid-argument-type]
         None,
         {
             "type": "text",
@@ -65,8 +65,8 @@ def form_extraction() -> FormExtraction:
 @pytest.fixture
 def summarization() -> Summarization:
     return Summarization.from_dict(
-        None,  # type: ignore[arg-type]
-        None,  # type: ignore[arg-type]
+        None,  # type: ignore[ty:invalid-argument-type]
+        None,  # type: ignore[ty:invalid-argument-type]
         None,
         {
             "label": "Accounting Summary",
@@ -97,8 +97,8 @@ Line Items:
 @pytest.fixture
 def unbundling() -> Unbundling:
     return Unbundling.from_dict(
-        None,  # type: ignore[arg-type]
-        None,  # type: ignore[arg-type]
+        None,  # type: ignore[ty:invalid-argument-type]
+        None,  # type: ignore[ty:invalid-argument-type]
         None,
         {
             "label": "Invoice",
@@ -135,7 +135,7 @@ def test_page(
     ["document_extraction", "form_extraction", "summarization", "unbundling"],
 )
 def test_confidence(prediction: Prediction, request: object) -> None:
-    prediction = request.getfixturevalue(prediction)  # type: ignore[attr-defined]
+    prediction = request.getfixturevalue(prediction)  # type: ignore[ty:unresolved-attribute]
     prediction.confidence = 0.5
     assert prediction.confidence == 0.5
     assert prediction.to_dict()["confidence"][prediction.label] == 0.5
@@ -146,7 +146,7 @@ def test_confidence(prediction: Prediction, request: object) -> None:
     ["document_extraction", "form_extraction", "summarization"],
 )
 def test_accept(extraction: Extraction, request: object) -> None:
-    extraction = request.getfixturevalue(extraction)  # type: ignore[attr-defined]
+    extraction = request.getfixturevalue(extraction)  # type: ignore[ty:unresolved-attribute]
     changes = extraction.to_dict()
     assert "accepted" not in changes
     assert "rejected" not in changes
@@ -170,7 +170,7 @@ def test_accept(extraction: Extraction, request: object) -> None:
     ["document_extraction", "form_extraction", "summarization"],
 )
 def test_reject(extraction: Extraction, request: object) -> None:
-    extraction = request.getfixturevalue(extraction)  # type: ignore[attr-defined]
+    extraction = request.getfixturevalue(extraction)  # type: ignore[ty:unresolved-attribute]
     changes = extraction.to_dict()
     assert "accepted" not in changes
     assert "rejected" not in changes
@@ -194,7 +194,7 @@ def test_reject(extraction: Extraction, request: object) -> None:
     ["document_extraction", "form_extraction"],
 )
 def test_text(extraction: Extraction, request: object) -> None:
-    extraction = request.getfixturevalue(extraction)  # type: ignore[attr-defined]
+    extraction = request.getfixturevalue(extraction)  # type: ignore[ty:unresolved-attribute]
     changes = extraction.to_dict()
     assert changes["text"] == "ORIGINAL_OCR"
     assert changes["normalized"]["text"] == "ORIGINAL_GENAI"

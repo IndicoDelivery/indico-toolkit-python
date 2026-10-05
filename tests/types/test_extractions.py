@@ -73,7 +73,12 @@ def test_to_csv(extractions_obj):
         extractions_obj.to_csv(filepath, append_if_exists=False)
         assert extractions_obj._preds == preds_copy
         df = pd.read_csv(filepath)
-        assert "confidence" and "text" and "label" and "filename" in df.columns
+        assert (
+            "confidence" in df.columns
+            and "text" in df.columns
+            and "label" in df.columns
+            and "filename" in df.columns
+        )
         assert df.shape == (25, 4)
         duplicated_obj.to_csv(filepath, append_if_exists=True)
         df = pd.read_csv(filepath)

@@ -59,7 +59,7 @@ def test_get_has_not(prediction: object) -> None:
 def test_nfilter() -> None:
     values = list(range(100))
     filtered = list(filter(lambda n: n % 2, filter(lambda n: n % 3, values)))
-    nfiltered = list(nfilter([(lambda n: n % 3), (lambda n: n % 2)], values))  # type: ignore[list-item, return-value]
+    nfiltered = list(nfilter([(lambda n: n % 3), (lambda n: n % 2)], values))  # type: ignore[ty:invalid-argument-type]
     assert filtered == nfiltered
 
 

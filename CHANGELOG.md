@@ -3,10 +3,47 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and versions match the minimum IPA version required to use functionality.
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+
+## [v10.0.0] - 2026-10-01
+
+Minimum Platform Version: `Intake v7.2`, `Insights v2.5`
+
+### Added
+
+- Added `orm`, `microclient`, and `router` modules for Insights.
+- Added `asyncstdlib`, `httpx`, and `tenacity` as package dependencies.
+
+### Changed
+
+- Migrated from `poetry` to `uv` for package management.
+    - Moved source code into `src/` directory.
+- Migrated from `black` to `ruff` for code formatting.
+    - Reformatted codebase.
+- Migrated from `mypy` to `ty` for static type checking.
+    - Corrected some type annotations and object types.
+- Updated GitHub Actions workflow.
+- Made `indico_toolkit.__version__` use pyproject.toml project metadata.
+- Replaced `indico-client` with `microclient` for `polling` API calls.
+
+### Fixed
+
+- Fixed some unit test assertions.
+
+### Removed
+
+- Removed `auto_review`, `errors`, `indico_wrapper`, `metrics`, `ocr`, `pipelines`,
+  `snapshots`, and `structure` modules.
+    - Removed associated units tests.
+- Removed `indico-client` dependency.
+- Dropped Support for EOL Python 3.10.
+    - Converted Python <=3.10 quoted type hints to >=3.11 unquoted type hints.
 
 
 ## [v7.2.3] - 2026-01-30
+
+Minimum Platform Version: `Intake v7.2`
 
 ### Added
 
@@ -29,6 +66,8 @@ and versions match the minimum IPA version required to use functionality.
 
 
 ## [v7.2.2] - 2025-10-14
+
+Minimum Platform Version: `Intake v7.2`
 
 ### Added
 
@@ -58,6 +97,8 @@ and versions match the minimum IPA version required to use functionality.
 
 ## [v7.2.1] - 2025-09-09
 
+Minimum Platform Version: `Intake v7.2`
+
 ### Fixed
 
 - Account for row spans and column spans in ETL output tables.
@@ -67,6 +108,8 @@ and versions match the minimum IPA version required to use functionality.
 
 
 ## [v7.2.0] - 2025-06-17
+
+Minimum Platform Version: `Intake v7.2`
 
 ### Added
 
@@ -91,6 +134,8 @@ and versions match the minimum IPA version required to use functionality.
 
 ## [v6.14.2] - 2025-05-08
 
+Minimum Platform Version: `Intake v6.14`
+
 ### Added
 
 - Support for imported models using IPA 7.2 `component_metadata` section.
@@ -108,6 +153,8 @@ and versions match the minimum IPA version required to use functionality.
 
 ## [v6.14.1] - 2025-03-20
 
+Minimum Platform Version: `Intake v6.14`
+
 ### Changed
 
 - Improve Poetry and Poe configuration.
@@ -115,6 +162,8 @@ and versions match the minimum IPA version required to use functionality.
 
 
 ## [v6.14.0] - 2025-03-10
+
+Minimum Platform Version: `Intake v6.14`
 
 ### Added
 
@@ -315,10 +364,11 @@ This is the first major version release tested to work on Indico 6.X.
 - Row Association now also sorting on 'bbtop'.
 
 
-[v7.2.3]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v7.2.2...v7.2.3
-[v7.2.2]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v7.2.1...v7.2.2
-[v7.2.1]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v7.2.0...v7.2.1
-[v7.2.0]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v6.14.2...v7.2.0
-[v6.14.2]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v6.14.1...v6.14.2
-[v6.14.1]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v6.14.0...v6.14.1
-[v6.14.0]: https://github.com/IndicoDataSolutions/indico-toolkit-python/tree/v6.14.0
+[v10.0.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.3...v10.0.0
+[v7.2.3]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.2...v7.2.3
+[v7.2.2]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.1...v7.2.2
+[v7.2.1]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.0...v7.2.1
+[v7.2.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v6.14.2...v7.2.0
+[v6.14.2]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v6.14.1...v6.14.2
+[v6.14.1]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v6.14.0...v6.14.1
+[v6.14.0]: https://github.com/IndicoDelivery/indico-toolkit-python/tree/v6.14.0
