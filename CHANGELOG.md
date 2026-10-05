@@ -33,11 +33,12 @@ Minimum Platform Version: `Intake v7.2`, `Insights v2.5`
 
 ### Removed
 
-- Removed `auto_review`, `errors`, `indico_wrapper`, `metrics`, `ocr`, `pipelines`, `snapshots`, and `structure` modules.
-- Removed associated units tests.
+- Removed `auto_review`, `errors`, `indico_wrapper`, `metrics`, `ocr`, `pipelines`,
+  `snapshots`, and `structure` modules.
+    - Removed associated units tests.
 - Removed `indico-client` dependency.
-- Support for EOL Python 3.10.
-- Removed Python <=3.10 type hint quoting.
+- Dropped Support for EOL Python 3.10.
+    - Converted Python <=3.10 quoted type hints to >=3.11 unquoted type hints.
 
 
 ## [v7.2.3] - 2026-01-30
@@ -363,11 +364,11 @@ This is the first major version release tested to work on Indico 6.X.
 - Row Association now also sorting on 'bbtop'.
 
 
-[v10.0.0]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v7.2.3...v10.0.0
-[v7.2.3]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v7.2.2...v7.2.3
-[v7.2.2]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v7.2.1...v7.2.2
-[v7.2.1]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v7.2.0...v7.2.1
-[v7.2.0]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v6.14.2...v7.2.0
-[v6.14.2]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v6.14.1...v6.14.2
-[v6.14.1]: https://github.com/IndicoDataSolutions/indico-toolkit-python/compare/v6.14.0...v6.14.1
-[v6.14.0]: https://github.com/IndicoDataSolutions/indico-toolkit-python/tree/v6.14.0
+[v10.0.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.3...v10.0.0
+[v7.2.3]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.2...v7.2.3
+[v7.2.2]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.1...v7.2.2
+[v7.2.1]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.0...v7.2.1
+[v7.2.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v6.14.2...v7.2.0
+[v6.14.2]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v6.14.1...v6.14.2
+[v6.14.1]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v6.14.0...v6.14.1
+[v6.14.0]: https://github.com/IndicoDelivery/indico-toolkit-python/tree/v6.14.0
