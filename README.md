@@ -6,14 +6,23 @@
 
 Classes, functions, and abstractions for building workflows and workspaces using the Indico platform.
 
-- [Polling Classes](https://github.com/IndicoDataSolutions/indico-toolkit-python/tree/main/indico_toolkit/polling/__init__.py)
-  that implement best-practices polling behavior for Intake Auto Review and Downstream
-  processes. Easily plug in business logic without the boilerplate.
-- [Result File](https://github.com/IndicoDataSolutions/indico-toolkit-python/blob/main/indico_toolkit/results/__init__.py)
-  and [Etl Output](https://github.com/IndicoDataSolutions/indico-toolkit-python/blob/main/indico_toolkit/etloutput/__init__.py)
-  Data Classes that parse standard Intake JSON output into idiomatic, type-safe Python dataclasses.
+- [MicroClient](./src/indico_toolkit/microclient.py)
+  class that provides async methods for making GraphQL, REST, and Storage calls.
+  Includes authentication and best-practices retry. Can be used as a single-file drop-in
+  module with few dependencies for other projects.
+- [ORM](./src/indico_toolkit/orm/__init__.py)
+  and [Router](./src/indico_toolkit/router/__init__.py)
+  classes for writing Insights custom agents using declarative Data Classes and
+  automatic load and save of instance attributes.
+- [Polling](./src/indico_toolkit/polling/__init__.py)
+  classes that implement best-practices polling behavior for Intake Auto Review and
+  Downstream processes. Easily plug in business logic without the boilerplate.
+- [Result File](./src/indico_toolkit/results/__init__.py)
+  and [Etl Output](./src/indico_toolkit/etloutput/__init__.py)
+  Data Classes that parse standard Intake JSON output into idiomatic, type-safe Python
+  dataclasses.
 
-...and more in the [Examples](https://github.com/IndicoDataSolutions/indico-toolkit-python/tree/main/examples) folder.
+...and more in the [Examples](./examples) folder.
 
 
 ## Installation
@@ -21,7 +30,7 @@ Classes, functions, and abstractions for building workflows and workspaces using
 **Indico Toolkit uses semantic versioning.**
 
 Indico Toolkit versions do not match the Intake or Insights versions they are compatible with.
-See the [Changelog](./CHANGELOG.md) for the minimum required platform version for each toolkit version.
+See the [Changelog](./CHANGELOG.md) for the minimum platform version required by each toolkit version.
 
 ```bash
 pip install indico-toolkit
