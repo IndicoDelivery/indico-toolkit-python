@@ -3,25 +3,26 @@ import textwrap
 import typing
 from collections.abc import Iterable, Iterator
 from datetime import date, datetime
+from enum import StrEnum
 from typing import Any
 
 from .collections import WeakIdKeyDictionary
 from .fields import get_fields, validate_fields
-from .types import Categorical, GraphqlIterator, SubmissionType
+from .types import GraphqlIterator, SubmissionType
 
 _SUPPORTED_COLLECTION_TYPES = (
     list,
     set,
     None,
 )
-_SUPPORTED_SCALAR_TYPES: tuple[type, ...] = (  # type: ignore[ty:invalid-assignment]
+_SUPPORTED_SCALAR_TYPES = (
     bool,
-    Categorical,
     date,
     datetime,
     float,
     int,
     str,
+    StrEnum,
 )
 
 _INSTANCE_PREV_VALUES = WeakIdKeyDictionary()
@@ -258,8 +259,6 @@ def _structured(scalar_type: type[Any], value: Any) -> dict[str, dict[str, Any]]
     """
     if scalar_type is bool:
         return {"boolean": {"value": value}}
-    elif scalar_type is Categorical:
-        return {"lookup": {"option": value}}
     elif scalar_type is date:
         return {"date": {"year": value.year, "month": value.month, "day": value.day}}
     elif scalar_type is datetime:
@@ -274,5 +273,7 @@ def _structured(scalar_type: type[Any], value: Any) -> dict[str, dict[str, Any]]
         return {"number": {"numberPrecise": str(value)}}
     elif scalar_type is str:
         return {"text": {"text": value}}
+    elif scalar_type is StrEnum or issubclass(scalar_type, StrEnum):
+        return {"lookup": {"option": value}}
     else:
         raise TypeError(f"unmapped scalar type {scalar_type}")
