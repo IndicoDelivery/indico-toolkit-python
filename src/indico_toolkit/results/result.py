@@ -71,9 +71,10 @@ class Result:
         review_metadata = get(result, dict, "reviews")
         errored_files = get(result, dict, "errored_files").values()
 
-        static_model_components = filter(
+        static_and_blueprint_components = filter(
             lambda component: (
-                get(component, str, "component_type").casefold() == "static_model"
+                get(component, str, "component_type").casefold()
+                in ("static_model", "custom_model")
             ),
             component_metadata.values(),
         )
@@ -87,7 +88,7 @@ class Result:
         tasks = sorted(
             chain(
                 map(Task.from_dict, modelgroup_metadata.values()),
-                map(Task.from_dict, static_model_components),
+                map(Task.from_dict, static_and_blueprint_components),
             )
         )
         reviews = sorted(map(Review.from_dict, review_metadata.values()))

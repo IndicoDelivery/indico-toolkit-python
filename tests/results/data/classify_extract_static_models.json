@@ -36,8 +36,8 @@
         "19412": {
             "id": 19412,
             "name": "Purchase Order Extraction",
-            "component_type": "static_model",
-            "task_type": "annotation"
+            "component_type": "custom_model",
+            "task_type": "genai_annotation"
         },
         "19413": {
             "id": 19413,
@@ -689,6 +689,51 @@
                                 ]
                             }
                         }
+                    ],
+                    "19412": [
+                        {
+                            "label": "Vendor Name",
+                            "spans": [
+                                {
+                                    "start": 0,
+                                    "end": 13,
+                                    "page_num": 0
+                                }
+                            ],
+                            "span_id": "93479:c:19411:idx:0",
+                            "confidence": {
+                                "Invoice Date": 3.3424697676309734e-08,
+                                "Invoice Number": 3.447171437187535e-08,
+                                "Invoice Subtotal": 2.993116865468437e-08,
+                                "Invoice Tax": 3.6883669451981405e-08,
+                                "Invoice Total": 2.7991509554681215e-08,
+                                "Line Item Name": 8.883939806025865e-09,
+                                "Line Item Quantity": 5.827023485949212e-08,
+                                "Line Item Total": 5.176908146609094e-08,
+                                "Vendor Name": 0.9999996423721313
+                            },
+                            "field_id": 858126,
+                            "location_type": "exact",
+                            "text": "HubSpot, Inc.",
+                            "groupings": [],
+                            "normalized": {
+                                "text": "HubSpot, Inc.",
+                                "start": 0,
+                                "end": 13,
+                                "structured": null,
+                                "formatted": "HubSpot, Inc.",
+                                "status": "SUCCESS",
+                                "comparison_type": "string",
+                                "comparison_value": "HubSpot, Inc.",
+                                "validation": [
+                                    {
+                                        "validation_type": "TYPE_CONVERSION",
+                                        "error_message": null,
+                                        "validation_status": "SUCCESS"
+                                    }
+                                ]
+                            }
+                        }
                     ]
                 },
                 "FINAL": {
@@ -1303,6 +1348,51 @@
                                 "comparison_value": "$1,301.56"
                             },
                             "location_type": "exact"
+                        }
+                    ],
+                    "19412": [
+                        {
+                            "label": "Vendor Name",
+                            "spans": [
+                                {
+                                    "start": 0,
+                                    "end": 13,
+                                    "page_num": 0
+                                }
+                            ],
+                            "span_id": "93479:c:19411:idx:0",
+                            "confidence": {
+                                "Invoice Date": 3.3424697676309734e-08,
+                                "Invoice Number": 3.447171437187535e-08,
+                                "Invoice Subtotal": 2.993116865468437e-08,
+                                "Invoice Tax": 3.6883669451981405e-08,
+                                "Invoice Total": 2.7991509554681215e-08,
+                                "Line Item Name": 8.883939806025865e-09,
+                                "Line Item Quantity": 5.827023485949212e-08,
+                                "Line Item Total": 5.176908146609094e-08,
+                                "Vendor Name": 0.9999996423721313
+                            },
+                            "field_id": 858126,
+                            "location_type": "exact",
+                            "text": "HubSpot, Inc.",
+                            "groupings": [],
+                            "normalized": {
+                                "text": "HubSpot, Inc.",
+                                "start": 0,
+                                "end": 13,
+                                "structured": null,
+                                "formatted": "HubSpot, Inc.",
+                                "status": "SUCCESS",
+                                "comparison_type": "string",
+                                "comparison_value": "HubSpot, Inc.",
+                                "validation": [
+                                    {
+                                        "validation_type": "TYPE_CONVERSION",
+                                        "error_message": null,
+                                        "validation_status": "SUCCESS"
+                                    }
+                                ]
+                            }
                         }
                     ]
                 }
