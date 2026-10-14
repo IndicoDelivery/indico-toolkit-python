@@ -1,5 +1,5 @@
 from collections.abc import Iterator
-from typing import TYPE_CHECKING, Annotated, Any, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
 
 if TYPE_CHECKING:
     from .submissions import Submission
@@ -17,4 +17,4 @@ TableType = TypeVar("TableType", bound="Table")
 OrmType = TypeVar("OrmType", bound="Submission | Table")
 
 # Scalar Field Types
-Categorical = Annotated[str, "CATEGORICAL"]
+# Price = ...

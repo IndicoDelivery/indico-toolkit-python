@@ -1,12 +1,11 @@
 import dataclasses
 import typing
-from collections.abc import Callable, Collection
+from collections.abc import Collection
 from datetime import date, datetime
+from enum import StrEnum
 from functools import cache
 from types import NoneType, UnionType
 from typing import Any, Union
-
-from .types import Categorical
 
 
 @dataclasses.dataclass(frozen=True)
@@ -21,12 +20,15 @@ class Field:
 
 def validate_fields(
     orm: type,
-    supported_scalar_types: Collection[type | None],
+    supported_scalar_types: Collection[type],
     supported_collection_types: Collection[type | None],
 ) -> None:
     for field in get_fields(orm):
         if not (
-            field.scalar_type in supported_scalar_types
+            (
+                field.scalar_type in supported_scalar_types
+                or issubclass(field.scalar_type, supported_scalar_types)  # type: ignore[ty:invalid-argument-type]
+            )
             and field.collection_type in supported_collection_types
         ):
             raise TypeError(f"{field.attribute} is not a supported type")
@@ -37,10 +39,8 @@ def get_fields(orm: type) -> tuple[Field, ...]:
     return tuple(
         map(
             _get_field,
-            filter(
-                lambda field: field.init,
-                dataclasses.fields(orm),  # type: ignore[ty:invalid-argument-type]
-            ),
+            # Only include fields in the dataclass's generated `__init__()`.
+            filter(lambda field: field.init, dataclasses.fields(orm)),  # type: ignore[ty:invalid-argument-type]
         )
     )
 
@@ -60,7 +60,7 @@ def _get_field(field: dataclasses.Field[Any]) -> Field:
             raise TypeError(f"{attribute} must be a single collection type")
 
     scalar_type = next(arg for arg in args if arg is not NoneType)
-    scalar_parser = SCALAR_PARSER_SERIALZER_BY_TYPE.get(scalar_type)
+    scalar_parser = _SCALAR_PARSER_BY_TYPE.get(scalar_type, scalar_type)
     multi = collection_type not in (Union, UnionType)
 
     return Field(
@@ -73,12 +73,8 @@ def _get_field(field: dataclasses.Field[Any]) -> Field:
     )
 
 
-SCALAR_PARSER_SERIALZER_BY_TYPE: dict[type, Callable[[type], object]] = {  # type: ignore[ty:invalid-assignment]
-    bool: bool,
-    Categorical: Categorical,
+_SCALAR_PARSER_BY_TYPE = {
     date: date.fromisoformat,
     datetime: datetime.fromisoformat,
-    float: float,
-    int: int,
-    str: str,
+    StrEnum: str,
 }
