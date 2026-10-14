@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [v10.1.0] - 2026-10-14
+
+Minimum Platform Version: `Intake v7.2`, `Insights v2.5`
+
+### Added
+
+- Support parsing blueprint components with the `results` module.
+
+### Changed
+
+- Use stdlib `enum.StrEnum` type for Categorical fields instead of `orm.Categorical`.
+
+
 ## [v10.0.0] - 2026-10-01
 
 Minimum Platform Version: `Intake v7.2`, `Insights v2.5`
@@ -364,6 +377,7 @@ This is the first major version release tested to work on Indico 6.X.
 - Row Association now also sorting on 'bbtop'.
 
 
+[v10.1.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v10.0.0...v10.1.0
 [v10.0.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.3...v10.0.0
 [v7.2.3]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.2...v7.2.3
 [v7.2.2]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.1...v7.2.2
