@@ -51,9 +51,13 @@ def load(submission_class: type[Submission], submission_id: int) -> GraphqlItera
             query load(
                 $submissionId: ID!
                 $fieldIds: [String!]!
+                $limit: Int
             ) {
                 submission(id: $submissionId) {
-                    fields(fieldIds: $fieldIds) {
+                    fields(
+                        fieldIds: $fieldIds
+                        limit: $limit
+                    ) {
                         field {
                             fieldId
                         }
@@ -76,6 +80,7 @@ def load(submission_class: type[Submission], submission_id: int) -> GraphqlItera
         {
             "submissionId": submission_id,
             "fieldIds": [field.id for field in get_fields(submission_class)],
+            "limit": len(get_fields(submission_class)),
         },
     )
 
