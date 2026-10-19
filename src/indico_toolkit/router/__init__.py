@@ -8,11 +8,13 @@ from .annotations import (
     ExportId,
     FieldIds,
     FileNameBytes,
+    MergedSubmissionId,
     OrmIter,
     SubmissionId,
     TableId,
 )
 from .create_submission import CreateSubmission, on_create_submission
+from .merge_submission import MergeSubmission, on_merge_submission
 from .start_export import (
     StartExport,
     on_start_custom_export,
@@ -30,7 +32,10 @@ __all__ = (
     "ExportId",
     "FieldIds",
     "FileNameBytes",
+    "MergedSubmissionId",
+    "MergeSubmission",
     "on_create_submission",
+    "on_merge_submission",
     "on_start_custom_export",
     "on_start_export",
     "on_start_json_export",
@@ -52,6 +57,7 @@ _ROUTE_MAPPING = {
     "new_submission": CreateSubmission,
     "status_change": UpdateStatus,
     "table_update": UpdateTable,
+    "submission_merge": MergeSubmission,
 }
 
 

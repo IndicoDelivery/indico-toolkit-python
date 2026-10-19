@@ -14,6 +14,7 @@ _AsyncKwargsIter: TypeAlias = AsyncIterator[tuple[str, Any]]
 DocumentId = NewType("DocumentId", int)
 ExportId = NewType("ExportId", int)
 FieldIds = NewType("FieldIds", frozenset[str])
+MergedSubmissionId = NewType("MergedSubmissionId", int)
 SubmissionId = NewType("SubmissionId", int)
 TableId = NewType("TableId", str)
 
@@ -46,6 +47,12 @@ def resolve_field(callback: Callback, signal: Any) -> _KwargsIter:
                 annotation_name,
                 frozenset(update["field_id"] for update in signal["updates"]),
             )
+
+
+def resolve_merged_submission(callback: Callback, signal: Any) -> _KwargsIter:
+    for annotation_name, annotation_type in _annotations(callback):
+        if annotation_type is MergedSubmissionId:
+            yield annotation_name, signal["merged_submission_id"]
 
 
 def resolve_microclient(callback: Callback, client: MicroClient) -> _KwargsIter:

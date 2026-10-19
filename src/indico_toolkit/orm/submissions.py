@@ -46,25 +46,30 @@ def load(submission_class: type[Submission], submission_id: int) -> GraphqlItera
     Yield GraphQL queries to load the fields specified on dataclass `submission_class`
     for submission ID `submission_id`.
     """
+    fields = get_fields(submission_class)
     yield (
         textwrap.dedent("""
             query load(
                 $submissionId: ID!
                 $fieldIds: [String!]!
+                $limit: Int
             ) {
                 submission(id: $submissionId) {
-                    fields(fieldIds: $fieldIds) {
+                    fields(
+                        fieldIds: $fieldIds
+                        limit: $limit
+                    ) {
                         field {
                             fieldId
                         }
                         values(
-                            filters: [
-                                {
-                                    field: "status"
-                                    op: EQUAL
+                            filters: {
+                                match: {
+                                    property: "status"
+                                    operator: EQUAL
                                     textValues: ["ACCEPTED", "BUILTIN"]
                                 }
-                            ]
+                            }
                         ) {
                             id
                             value
@@ -75,7 +80,8 @@ def load(submission_class: type[Submission], submission_id: int) -> GraphqlItera
         """).strip(),
         {
             "submissionId": submission_id,
-            "fieldIds": [field.id for field in get_fields(submission_class)],
+            "fieldIds": [field.id for field in fields],
+            "limit": len(fields),
         },
     )
 

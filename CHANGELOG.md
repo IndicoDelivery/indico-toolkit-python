@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [v10.2.0] - 2026-10-19
+
+Minimum Platform Version: `Intake v7.2`, `Insights v3.0`
+
+### Added
+
+- `router.on_merge_submission()` signal decorator.
+
+### Changed
+
+- Minimum Insights version to `v3.0`.
+- ORM GraphQL queries to Insights 3.0 schema.
+
+
 ## [v10.1.0] - 2026-10-14
 
 Minimum Platform Version: `Intake v7.2`, `Insights v2.5`
@@ -377,6 +391,7 @@ This is the first major version release tested to work on Indico 6.X.
 - Row Association now also sorting on 'bbtop'.
 
 
+[v10.2.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v10.1.0...v10.2.0
 [v10.1.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v10.0.0...v10.1.0
 [v10.0.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.3...v10.0.0
 [v7.2.3]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.2...v7.2.3
