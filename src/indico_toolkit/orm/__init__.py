@@ -5,14 +5,16 @@ from typing import Any
 from . import submissions, tables
 from .submissions import Submission
 from .tables import Table
-from .types import GraphqlIterator, OrmType
+from .types import GraphqlIterator, OrmType, Price, User
 
 __all__ = (
     "init",
     "load",
+    "Price",
     "save",
     "Submission",
     "Table",
+    "User",
 )
 
 
