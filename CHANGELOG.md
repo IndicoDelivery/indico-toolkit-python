@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [v10.3.0] - 2026-10-29
+
+Minimum Platform Version: `Intake v7.2`, `Insights v3.0`
+
+### Added
+
+- `orm.Price` and `orm.User` scalar types.
+
+
 ## [v10.2.0] - 2026-10-19
 
 Minimum Platform Version: `Intake v7.2`, `Insights v3.0`
@@ -391,6 +400,7 @@ This is the first major version release tested to work on Indico 6.X.
 - Row Association now also sorting on 'bbtop'.
 
 
+[v10.3.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v10.2.0...v10.3.0
 [v10.2.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v10.1.0...v10.2.0
 [v10.1.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v10.0.0...v10.1.0
 [v10.0.0]: https://github.com/IndicoDelivery/indico-toolkit-python/compare/v7.2.3...v10.0.0
