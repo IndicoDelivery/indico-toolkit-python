@@ -79,7 +79,7 @@ def init(table_class: type[TableType], graphql: Iterable[Any]) -> Iterator[Table
 
         for field in get_fields(table_class):
             if value := values_by_field_id.get(field.id):
-                kwargs[field.id] = field.scalar_type(value.value)
+                kwargs[field.id] = field.parse(value)
             else:
                 kwargs[field.id] = None
 
