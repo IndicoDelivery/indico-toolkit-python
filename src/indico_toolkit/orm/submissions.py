@@ -8,7 +8,7 @@ from typing import Any
 
 from .collections import WeakIdKeyDictionary
 from .fields import get_fields, validate_fields
-from .types import GraphqlIterator, SubmissionType
+from .types import GraphqlIterator, Price, SubmissionType, User
 
 _SUPPORTED_COLLECTION_TYPES = (
     list,
@@ -21,8 +21,10 @@ _SUPPORTED_SCALAR_TYPES = (
     datetime,
     float,
     int,
+    Price,
     str,
     StrEnum,
+    User,
 )
 
 _INSTANCE_PREV_VALUES = WeakIdKeyDictionary()
@@ -73,6 +75,17 @@ def load(submission_class: type[Submission], submission_id: int) -> GraphqlItera
                         ) {
                             id
                             value
+                            structured {
+                                ... on PriceStructured {
+                                    amount
+                                    currency
+                                }
+                                ... on UserStructured {
+                                    id: userId
+                                    name: displayName
+                                    email
+                                }
+                            }
                         }
                     }
                 }
@@ -109,23 +122,17 @@ def init(submission_class: type[SubmissionType], graphql: Iterable[Any]) -> Iter
                 prev_values[field.id] = field.collection_type()
                 prev_ids[field.id] = None
             else:
-                kwargs[field.id] = field.collection_type(
-                    field.scalar_parser(value.value) for value in values
-                )
-                prev_values[field.id] = field.collection_type(
-                    field.scalar_parser(value.value) for value in values
-                )
-                prev_ids[field.id] = {
-                    field.scalar_parser(value.value): value.id for value in values
-                }
+                kwargs[field.id] = field.collection_type(map(field.parse, values))
+                prev_values[field.id] = field.collection_type(map(field.parse, values))
+                prev_ids[field.id] = {field.parse(value): value.id for value in values}
         else:
             if not values:
                 kwargs[field.id] = None
                 prev_values[field.id] = None
                 prev_ids[field.id] = None
             else:
-                kwargs[field.id] = field.scalar_parser(values[0].value)
-                prev_values[field.id] = field.scalar_parser(values[0].value)
+                kwargs[field.id] = field.parse(values[0])
+                prev_values[field.id] = field.parse(values[0])
                 prev_ids[field.id] = values[0].id
 
     instance = submission_class(**kwargs)
@@ -266,7 +273,13 @@ def _structured(scalar_type: type[Any], value: Any) -> dict[str, dict[str, Any]]
     if scalar_type is bool:
         return {"boolean": {"value": value}}
     elif scalar_type is date:
-        return {"date": {"year": value.year, "month": value.month, "day": value.day}}
+        return {
+            "date": {
+                "year": value.year,
+                "month": value.month,
+                "day": value.day,
+            }
+        }
     elif scalar_type is datetime:
         return {
             "dateTime": {
@@ -277,9 +290,23 @@ def _structured(scalar_type: type[Any], value: Any) -> dict[str, dict[str, Any]]
         }  # fmt: skip
     elif scalar_type is int or scalar_type is float:
         return {"number": {"numberPrecise": str(value)}}
+    elif scalar_type is Price:
+        return {
+            "price": {
+                "amountPrecise": str(value.amount),
+                "currency": value.currency,
+            }
+        }
     elif scalar_type is str:
         return {"text": {"text": value}}
     elif scalar_type is StrEnum or issubclass(scalar_type, StrEnum):
         return {"lookup": {"option": value}}
+    elif scalar_type is User:
+        return {
+            "user": {
+                "userId": value.id,
+                "email": value.email,
+            }
+        }
     else:
         raise TypeError(f"unmapped scalar type {scalar_type}")

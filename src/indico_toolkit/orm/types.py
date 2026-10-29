@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, TypeAlias, TypeVar
 
 if TYPE_CHECKING:
@@ -16,5 +17,16 @@ SubmissionType = TypeVar("SubmissionType", bound="Submission")
 TableType = TypeVar("TableType", bound="Table")
 OrmType = TypeVar("OrmType", bound="Submission | Table")
 
+
 # Scalar Field Types
-# Price = ...
+@dataclass(frozen=True)
+class Price:
+    amount: float
+    currency: str
+
+
+@dataclass(frozen=True)
+class User:
+    id: int
+    name: str
+    email: str

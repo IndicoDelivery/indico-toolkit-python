@@ -17,6 +17,12 @@ class Field:
     collection_type: type | None
     attribute: str
 
+    def parse(self, value: Any) -> Any:
+        if dataclasses.is_dataclass(self.scalar_type):
+            return self.scalar_type(**vars(value.structured))
+        else:
+            return self.scalar_parser(value.value)
+
 
 def validate_fields(
     orm: type,
