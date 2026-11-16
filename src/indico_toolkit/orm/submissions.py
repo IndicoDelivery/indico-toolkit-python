@@ -65,7 +65,7 @@ def load(submission_class: type[Submission], submission_id: int) -> GraphqlItera
                             fieldId
                         }
                         values(
-                            filters: {
+                            filter: {
                                 match: {
                                     property: "status"
                                     operator: EQUAL
